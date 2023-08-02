@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>dna2vec package &mdash; deepEPI 1.0.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            deepEPI
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">dna2vec package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#dna2vec-generators-module">dna2vec.generators module</a></li>
+<li><a class="reference internal" href="#module-dna2vec.histogram">dna2vec.histogram module</a><ul>
+<li><a class="reference internal" href="#dna2vec.histogram.Histogram"><code class="docutils literal notranslate"><span class="pre">Histogram</span></code></a><ul>
+<li><a class="reference internal" href="#dna2vec.histogram.Histogram.add"><code class="docutils literal notranslate"><span class="pre">Histogram.add()</span></code></a></li>
+<li><a class="reference internal" href="#dna2vec.histogram.Histogram.print_stat"><code class="docutils literal notranslate"><span class="pre">Histogram.print_stat()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-dna2vec.multi_k_model">dna2vec.multi_k_model module</a><ul>
+<li><a class="reference internal" href="#dna2vec.multi_k_model.MultiKModel"><code class="docutils literal notranslate"><span class="pre">MultiKModel</span></code></a><ul>
+<li><a class="reference internal" href="#dna2vec.multi_k_model.MultiKModel.cosine_distance"><code class="docutils literal notranslate"><span class="pre">MultiKModel.cosine_distance()</span></code></a></li>
+<li><a class="reference internal" href="#dna2vec.multi_k_model.MultiKModel.l2_norm"><code class="docutils literal notranslate"><span class="pre">MultiKModel.l2_norm()</span></code></a></li>
+<li><a class="reference internal" href="#dna2vec.multi_k_model.MultiKModel.model"><code class="docutils literal notranslate"><span class="pre">MultiKModel.model()</span></code></a></li>
+<li><a class="reference internal" href="#dna2vec.multi_k_model.MultiKModel.separate_out_model"><code class="docutils literal notranslate"><span class="pre">MultiKModel.separate_out_model()</span></code></a></li>
+<li><a class="reference internal" href="#dna2vec.multi_k_model.MultiKModel.unitvec"><code class="docutils literal notranslate"><span class="pre">MultiKModel.unitvec()</span></code></a></li>
+<li><a class="reference internal" href="#dna2vec.multi_k_model.MultiKModel.vector"><code class="docutils literal notranslate"><span class="pre">MultiKModel.vector()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#dna2vec.multi_k_model.SingleKModel"><code class="docutils literal notranslate"><span class="pre">SingleKModel</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-dna2vec">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">deepEPI</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">dna2vec package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/dna2vec.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="dna2vec-package">
+<h1>dna2vec package<a class="headerlink" href="#dna2vec-package" title="Permalink to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+</section>
+<section id="dna2vec-generators-module">
+<h2>dna2vec.generators module<a class="headerlink" href="#dna2vec-generators-module" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-dna2vec.histogram">
+<span id="dna2vec-histogram-module"></span><h2>dna2vec.histogram module<a class="headerlink" href="#module-dna2vec.histogram" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="dna2vec.histogram.Histogram">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dna2vec.histogram.</span></span><span class="sig-name descname"><span class="pre">Histogram</span></span><a class="headerlink" href="#dna2vec.histogram.Histogram" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="dna2vec.histogram.Histogram.add">
+<span class="sig-name descname"><span class="pre">add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seq</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dna2vec.histogram.Histogram.add" title="Permalink to this definition"></a></dt>
+<dd><p>seq - array of k-mer string</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dna2vec.histogram.Histogram.print_stat">
+<span class="sig-name descname"><span class="pre">print_stat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fptr</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dna2vec.histogram.Histogram.print_stat" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-dna2vec.multi_k_model">
+<span id="dna2vec-multi-k-model-module"></span><h2>dna2vec.multi_k_model module<a class="headerlink" href="#module-dna2vec.multi_k_model" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="dna2vec.multi_k_model.MultiKModel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dna2vec.multi_k_model.</span></span><span class="sig-name descname"><span class="pre">MultiKModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dna2vec.multi_k_model.MultiKModel" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="dna2vec.multi_k_model.MultiKModel.cosine_distance">
+<span class="sig-name descname"><span class="pre">cosine_distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vocab1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vocab2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dna2vec.multi_k_model.MultiKModel.cosine_distance" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dna2vec.multi_k_model.MultiKModel.l2_norm">
+<span class="sig-name descname"><span class="pre">l2_norm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vocab</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dna2vec.multi_k_model.MultiKModel.l2_norm" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dna2vec.multi_k_model.MultiKModel.model">
+<span class="sig-name descname"><span class="pre">model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k_len</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dna2vec.multi_k_model.MultiKModel.model" title="Permalink to this definition"></a></dt>
+<dd><p>Use vector(‘ACGTA’) when possible</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dna2vec.multi_k_model.MultiKModel.separate_out_model">
+<span class="sig-name descname"><span class="pre">separate_out_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k_len</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dna2vec.multi_k_model.MultiKModel.separate_out_model" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dna2vec.multi_k_model.MultiKModel.unitvec">
+<span class="sig-name descname"><span class="pre">unitvec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vec</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dna2vec.multi_k_model.MultiKModel.unitvec" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dna2vec.multi_k_model.MultiKModel.vector">
+<span class="sig-name descname"><span class="pre">vector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vocab</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dna2vec.multi_k_model.MultiKModel.vector" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="dna2vec.multi_k_model.SingleKModel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dna2vec.multi_k_model.</span></span><span class="sig-name descname"><span class="pre">SingleKModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dna2vec.multi_k_model.SingleKModel" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</dd></dl>
+
+</section>
+<section id="module-dna2vec">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-dna2vec" title="Permalink to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Hongfei Liu.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

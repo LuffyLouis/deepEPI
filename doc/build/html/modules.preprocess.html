@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>modules.preprocess package &mdash; deepEPI 1.0.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            deepEPI
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">modules.preprocess package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-modules.preprocess.balance">modules.preprocess.balance module</a><ul>
+<li><a class="reference internal" href="#modules.preprocess.balance.BalanceDatasets"><code class="docutils literal notranslate"><span class="pre">BalanceDatasets</span></code></a><ul>
+<li><a class="reference internal" href="#modules.preprocess.balance.BalanceDatasets.balance_datasets"><code class="docutils literal notranslate"><span class="pre">BalanceDatasets.balance_datasets()</span></code></a></li>
+<li><a class="reference internal" href="#modules.preprocess.balance.BalanceDatasets.create_interactions_db"><code class="docutils literal notranslate"><span class="pre">BalanceDatasets.create_interactions_db()</span></code></a></li>
+<li><a class="reference internal" href="#modules.preprocess.balance.BalanceDatasets.create_raw_interaction_db"><code class="docutils literal notranslate"><span class="pre">BalanceDatasets.create_raw_interaction_db()</span></code></a></li>
+<li><a class="reference internal" href="#modules.preprocess.balance.BalanceDatasets.extract_fasta"><code class="docutils literal notranslate"><span class="pre">BalanceDatasets.extract_fasta()</span></code></a></li>
+<li><a class="reference internal" href="#modules.preprocess.balance.BalanceDatasets.extract_seq"><code class="docutils literal notranslate"><span class="pre">BalanceDatasets.extract_seq()</span></code></a></li>
+<li><a class="reference internal" href="#modules.preprocess.balance.BalanceDatasets.format_fasta"><code class="docutils literal notranslate"><span class="pre">BalanceDatasets.format_fasta()</span></code></a></li>
+<li><a class="reference internal" href="#modules.preprocess.balance.BalanceDatasets.get_GC_content"><code class="docutils literal notranslate"><span class="pre">BalanceDatasets.get_GC_content()</span></code></a></li>
+<li><a class="reference internal" href="#modules.preprocess.balance.BalanceDatasets.get_mean_GC_content"><code class="docutils literal notranslate"><span class="pre">BalanceDatasets.get_mean_GC_content()</span></code></a></li>
+<li><a class="reference internal" href="#modules.preprocess.balance.BalanceDatasets.init_genome"><code class="docutils literal notranslate"><span class="pre">BalanceDatasets.init_genome()</span></code></a></li>
+<li><a class="reference internal" href="#modules.preprocess.balance.BalanceDatasets.init_interactions"><code class="docutils literal notranslate"><span class="pre">BalanceDatasets.init_interactions()</span></code></a></li>
+<li><a class="reference internal" href="#modules.preprocess.balance.BalanceDatasets.query_matched_neg"><code class="docutils literal notranslate"><span class="pre">BalanceDatasets.query_matched_neg()</span></code></a></li>
+<li><a class="reference internal" href="#modules.preprocess.balance.BalanceDatasets.run"><code class="docutils literal notranslate"><span class="pre">BalanceDatasets.run()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-modules.preprocess.common">modules.preprocess.common module</a><ul>
+<li><a class="reference internal" href="#modules.preprocess.common.ChunkReadAndRunThread"><code class="docutils literal notranslate"><span class="pre">ChunkReadAndRunThread</span></code></a><ul>
+<li><a class="reference internal" href="#modules.preprocess.common.ChunkReadAndRunThread.combine_interactions"><code class="docutils literal notranslate"><span class="pre">ChunkReadAndRunThread.combine_interactions()</span></code></a></li>
+<li><a class="reference internal" href="#modules.preprocess.common.ChunkReadAndRunThread.output_func"><code class="docutils literal notranslate"><span class="pre">ChunkReadAndRunThread.output_func()</span></code></a></li>
+<li><a class="reference internal" href="#modules.preprocess.common.ChunkReadAndRunThread.read_valid_pairs"><code class="docutils literal notranslate"><span class="pre">ChunkReadAndRunThread.read_valid_pairs()</span></code></a></li>
+<li><a class="reference internal" href="#modules.preprocess.common.ChunkReadAndRunThread.run_each"><code class="docutils literal notranslate"><span class="pre">ChunkReadAndRunThread.run_each()</span></code></a></li>
+<li><a class="reference internal" href="#modules.preprocess.common.ChunkReadAndRunThread.write_output"><code class="docutils literal notranslate"><span class="pre">ChunkReadAndRunThread.write_output()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-modules.preprocess.extract_seqs">modules.preprocess.extract_seqs module</a><ul>
+<li><a class="reference internal" href="#modules.preprocess.extract_seqs.ExtractDatasets"><code class="docutils literal notranslate"><span class="pre">ExtractDatasets</span></code></a><ul>
+<li><a class="reference internal" href="#modules.preprocess.extract_seqs.ExtractDatasets.combine_interactions"><code class="docutils literal notranslate"><span class="pre">ExtractDatasets.combine_interactions()</span></code></a></li>
+<li><a class="reference internal" href="#modules.preprocess.extract_seqs.ExtractDatasets.encode_seq"><code class="docutils literal notranslate"><span class="pre">ExtractDatasets.encode_seq()</span></code></a></li>
+<li><a class="reference internal" href="#modules.preprocess.extract_seqs.ExtractDatasets.export_h5"><code class="docutils literal notranslate"><span class="pre">ExtractDatasets.export_h5()</span></code></a></li>
+<li><a class="reference internal" href="#modules.preprocess.extract_seqs.ExtractDatasets.extract_dataset"><code class="docutils literal notranslate"><span class="pre">ExtractDatasets.extract_dataset()</span></code></a></li>
+<li><a class="reference internal" href="#modules.preprocess.extract_seqs.ExtractDatasets.extract_seq"><code class="docutils literal notranslate"><span class="pre">ExtractDatasets.extract_seq()</span></code></a></li>
+<li><a class="reference internal" href="#modules.preprocess.extract_seqs.ExtractDatasets.extract_seqs"><code class="docutils literal notranslate"><span class="pre">ExtractDatasets.extract_seqs()</span></code></a></li>
+<li><a class="reference internal" href="#modules.preprocess.extract_seqs.ExtractDatasets.format_fasta"><code class="docutils literal notranslate"><span class="pre">ExtractDatasets.format_fasta()</span></code></a></li>
+<li><a class="reference internal" href="#modules.preprocess.extract_seqs.ExtractDatasets.init_encoder"><code class="docutils literal notranslate"><span class="pre">ExtractDatasets.init_encoder()</span></code></a></li>
+<li><a class="reference internal" href="#modules.preprocess.extract_seqs.ExtractDatasets.init_interactions_fasta"><code class="docutils literal notranslate"><span class="pre">ExtractDatasets.init_interactions_fasta()</span></code></a></li>
+<li><a class="reference internal" href="#modules.preprocess.extract_seqs.ExtractDatasets.init_k_mer"><code class="docutils literal notranslate"><span class="pre">ExtractDatasets.init_k_mer()</span></code></a></li>
+<li><a class="reference internal" href="#modules.preprocess.extract_seqs.ExtractDatasets.process_seq"><code class="docutils literal notranslate"><span class="pre">ExtractDatasets.process_seq()</span></code></a></li>
+<li><a class="reference internal" href="#modules.preprocess.extract_seqs.ExtractDatasets.run"><code class="docutils literal notranslate"><span class="pre">ExtractDatasets.run()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-modules.preprocess.filtration">modules.preprocess.filtration module</a><ul>
+<li><a class="reference internal" href="#modules.preprocess.filtration.FilterInteractions"><code class="docutils literal notranslate"><span class="pre">FilterInteractions</span></code></a><ul>
+<li><a class="reference internal" href="#modules.preprocess.filtration.FilterInteractions.create_annotation_db"><code class="docutils literal notranslate"><span class="pre">FilterInteractions.create_annotation_db()</span></code></a></li>
+<li><a class="reference internal" href="#modules.preprocess.filtration.FilterInteractions.create_promoter_db"><code class="docutils literal notranslate"><span class="pre">FilterInteractions.create_promoter_db()</span></code></a></li>
+<li><a class="reference internal" href="#modules.preprocess.filtration.FilterInteractions.filt_interactions"><code class="docutils literal notranslate"><span class="pre">FilterInteractions.filt_interactions()</span></code></a></li>
+<li><a class="reference internal" href="#modules.preprocess.filtration.FilterInteractions.get_distance"><code class="docutils literal notranslate"><span class="pre">FilterInteractions.get_distance()</span></code></a></li>
+<li><a class="reference internal" href="#modules.preprocess.filtration.FilterInteractions.get_within_compartment"><code class="docutils literal notranslate"><span class="pre">FilterInteractions.get_within_compartment()</span></code></a></li>
+<li><a class="reference internal" href="#modules.preprocess.filtration.FilterInteractions.get_within_promoter"><code class="docutils literal notranslate"><span class="pre">FilterInteractions.get_within_promoter()</span></code></a></li>
+<li><a class="reference internal" href="#modules.preprocess.filtration.FilterInteractions.get_within_promoter_num"><code class="docutils literal notranslate"><span class="pre">FilterInteractions.get_within_promoter_num()</span></code></a></li>
+<li><a class="reference internal" href="#modules.preprocess.filtration.FilterInteractions.query_within_promoter"><code class="docutils literal notranslate"><span class="pre">FilterInteractions.query_within_promoter()</span></code></a></li>
+<li><a class="reference internal" href="#modules.preprocess.filtration.FilterInteractions.run"><code class="docutils literal notranslate"><span class="pre">FilterInteractions.run()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-modules.preprocess.generate_compartments">modules.preprocess.generate_compartments module</a><ul>
+<li><a class="reference internal" href="#modules.preprocess.generate_compartments.GenerateCompartments"><code class="docutils literal notranslate"><span class="pre">GenerateCompartments</span></code></a><ul>
+<li><a class="reference internal" href="#modules.preprocess.generate_compartments.GenerateCompartments.generate_compartments"><code class="docutils literal notranslate"><span class="pre">GenerateCompartments.generate_compartments()</span></code></a></li>
+<li><a class="reference internal" href="#modules.preprocess.generate_compartments.GenerateCompartments.run"><code class="docutils literal notranslate"><span class="pre">GenerateCompartments.run()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#modules.preprocess.generate_compartments.generate_compartments_each"><code class="docutils literal notranslate"><span class="pre">generate_compartments_each()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-modules.preprocess.generate_interactions">modules.preprocess.generate_interactions module</a><ul>
+<li><a class="reference internal" href="#modules.preprocess.generate_interactions.GenerateInteractions"><code class="docutils literal notranslate"><span class="pre">GenerateInteractions</span></code></a><ul>
+<li><a class="reference internal" href="#modules.preprocess.generate_interactions.GenerateInteractions.add_location"><code class="docutils literal notranslate"><span class="pre">GenerateInteractions.add_location()</span></code></a></li>
+<li><a class="reference internal" href="#modules.preprocess.generate_interactions.GenerateInteractions.annotate_eigenvec"><code class="docutils literal notranslate"><span class="pre">GenerateInteractions.annotate_eigenvec()</span></code></a></li>
+<li><a class="reference internal" href="#modules.preprocess.generate_interactions.GenerateInteractions.combine_eigenvec"><code class="docutils literal notranslate"><span class="pre">GenerateInteractions.combine_eigenvec()</span></code></a></li>
+<li><a class="reference internal" href="#modules.preprocess.generate_interactions.GenerateInteractions.combine_interactions"><code class="docutils literal notranslate"><span class="pre">GenerateInteractions.combine_interactions()</span></code></a></li>
+<li><a class="reference internal" href="#modules.preprocess.generate_interactions.GenerateInteractions.generate_interactions"><code class="docutils literal notranslate"><span class="pre">GenerateInteractions.generate_interactions()</span></code></a></li>
+<li><a class="reference internal" href="#modules.preprocess.generate_interactions.GenerateInteractions.merge_interactions"><code class="docutils literal notranslate"><span class="pre">GenerateInteractions.merge_interactions()</span></code></a></li>
+<li><a class="reference internal" href="#modules.preprocess.generate_interactions.GenerateInteractions.output_func"><code class="docutils literal notranslate"><span class="pre">GenerateInteractions.output_func()</span></code></a></li>
+<li><a class="reference internal" href="#modules.preprocess.generate_interactions.GenerateInteractions.query_compartment"><code class="docutils literal notranslate"><span class="pre">GenerateInteractions.query_compartment()</span></code></a></li>
+<li><a class="reference internal" href="#modules.preprocess.generate_interactions.GenerateInteractions.read_valid_pairs"><code class="docutils literal notranslate"><span class="pre">GenerateInteractions.read_valid_pairs()</span></code></a></li>
+<li><a class="reference internal" href="#modules.preprocess.generate_interactions.GenerateInteractions.run"><code class="docutils literal notranslate"><span class="pre">GenerateInteractions.run()</span></code></a></li>
+<li><a class="reference internal" href="#modules.preprocess.generate_interactions.GenerateInteractions.run_each"><code class="docutils literal notranslate"><span class="pre">GenerateInteractions.run_each()</span></code></a></li>
+<li><a class="reference internal" href="#modules.preprocess.generate_interactions.GenerateInteractions.write_output"><code class="docutils literal notranslate"><span class="pre">GenerateInteractions.write_output()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-modules.preprocess">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">deepEPI</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">modules.preprocess package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/modules.preprocess.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="modules-preprocess-package">
+<h1>modules.preprocess package<a class="headerlink" href="#modules-preprocess-package" title="Permalink to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-modules.preprocess.balance">
+<span id="modules-preprocess-balance-module"></span><h2>modules.preprocess.balance module<a class="headerlink" href="#module-modules.preprocess.balance" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="modules.preprocess.balance.BalanceDatasets">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">modules.preprocess.balance.</span></span><span class="sig-name descname"><span class="pre">BalanceDatasets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filter_interactions_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raw_interactions_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reference_genome</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">GC_content</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">balanced_interaction_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">balanced_same_chromsome</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threads</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chunksize</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.preprocess.balance.BalanceDatasets" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#modules.preprocess.common.ChunkReadAndRunThread" title="modules.preprocess.common.ChunkReadAndRunThread"><code class="xref py py-class docutils literal notranslate"><span class="pre">ChunkReadAndRunThread</span></code></a></p>
+<p>Balance the sequence datasets at positive and negative section</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="modules.preprocess.balance.BalanceDatasets.balance_datasets">
+<span class="sig-name descname"><span class="pre">balance_datasets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chunk_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">task_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp_file</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.preprocess.balance.BalanceDatasets.balance_datasets" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>chunk_id</strong> – </p></li>
+<li><p><strong>task_id</strong> – </p></li>
+<li><p><strong>temp_data</strong> – </p></li>
+<li><p><strong>temp_file</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="modules.preprocess.balance.BalanceDatasets.create_interactions_db">
+<span class="sig-name descname"><span class="pre">create_interactions_db</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#modules.preprocess.balance.BalanceDatasets.create_interactions_db" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="modules.preprocess.balance.BalanceDatasets.create_raw_interaction_db">
+<span class="sig-name descname"><span class="pre">create_raw_interaction_db</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#modules.preprocess.balance.BalanceDatasets.create_raw_interaction_db" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="modules.preprocess.balance.BalanceDatasets.extract_fasta">
+<span class="sig-name descname"><span class="pre">extract_fasta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chunk_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_GC</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.preprocess.balance.BalanceDatasets.extract_fasta" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>chunk_id</strong> – </p></li>
+<li><p><strong>temp_data</strong> – </p></li>
+<li><p><strong>return_GC</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="modules.preprocess.balance.BalanceDatasets.extract_seq">
+<span class="sig-name descname"><span class="pre">extract_seq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fasta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chrom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strand</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'+'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.preprocess.balance.BalanceDatasets.extract_seq" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fasta</strong> – </p></li>
+<li><p><strong>chrom</strong> – </p></li>
+<li><p><strong>start</strong> – </p></li>
+<li><p><strong>end</strong> – </p></li>
+<li><p><strong>strand</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="modules.preprocess.balance.BalanceDatasets.format_fasta">
+<span class="sig-name descname"><span class="pre">format_fasta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seq</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.preprocess.balance.BalanceDatasets.format_fasta" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="modules.preprocess.balance.BalanceDatasets.get_GC_content">
+<span class="sig-name descname"><span class="pre">get_GC_content</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seq</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.preprocess.balance.BalanceDatasets.get_GC_content" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>seq</strong> – </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="modules.preprocess.balance.BalanceDatasets.get_mean_GC_content">
+<span class="sig-name descname"><span class="pre">get_mean_GC_content</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#modules.preprocess.balance.BalanceDatasets.get_mean_GC_content" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="modules.preprocess.balance.BalanceDatasets.init_genome">
+<span class="sig-name descname"><span class="pre">init_genome</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#modules.preprocess.balance.BalanceDatasets.init_genome" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="modules.preprocess.balance.BalanceDatasets.init_interactions">
+<span class="sig-name descname"><span class="pre">init_interactions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#modules.preprocess.balance.BalanceDatasets.init_interactions" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="modules.preprocess.balance.BalanceDatasets.query_matched_neg">
+<span class="sig-name descname"><span class="pre">query_matched_neg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chrom1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chrom2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.preprocess.balance.BalanceDatasets.query_matched_neg" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>chrom1</strong> – </p></li>
+<li><p><strong>start1</strong> – </p></li>
+<li><p><strong>end1</strong> – </p></li>
+<li><p><strong>chrom2</strong> – </p></li>
+<li><p><strong>start2</strong> – </p></li>
+<li><p><strong>end2</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="modules.preprocess.balance.BalanceDatasets.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#modules.preprocess.balance.BalanceDatasets.run" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-modules.preprocess.common">
+<span id="modules-preprocess-common-module"></span><h2>modules.preprocess.common module<a class="headerlink" href="#module-modules.preprocess.common" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="modules.preprocess.common.ChunkReadAndRunThread">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">modules.preprocess.common.</span></span><span class="sig-name descname"><span class="pre">ChunkReadAndRunThread</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">report_interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.preprocess.common.ChunkReadAndRunThread" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A class for reading data by a chunk size with multi-threads/processors</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="modules.preprocess.common.ChunkReadAndRunThread.combine_interactions">
+<span class="sig-name descname"><span class="pre">combine_interactions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chunk_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp_output_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp_output_pattern</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.preprocess.common.ChunkReadAndRunThread.combine_interactions" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>chunk_id</strong> – chunk id for reading data with a chunk size</p></li>
+<li><p><strong>output_file</strong> – the path of output file</p></li>
+<li><p><strong>temp_output_dir</strong> – temporary directory</p></li>
+<li><p><strong>temp_output_pattern</strong> – the RegExp pattern for temporary filename</p></li>
+<li><p><strong>verbose</strong> – whether to open the verbose mode</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="modules.preprocess.common.ChunkReadAndRunThread.output_func">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">output_func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">line_break</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.preprocess.common.ChunkReadAndRunThread.output_func" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>output_file</strong> – </p></li>
+<li><p><strong>content</strong> – </p></li>
+<li><p><strong>line_break</strong> – </p></li>
+<li><p><strong>init</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="modules.preprocess.common.ChunkReadAndRunThread.read_valid_pairs">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">read_valid_pairs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">valid_pairs_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chunksize</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colnames</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">header</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.preprocess.common.ChunkReadAndRunThread.read_valid_pairs" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>valid_pairs_file</strong> – </p></li>
+<li><p><strong>chunksize</strong> – </p></li>
+<li><p><strong>colnames</strong> – </p></li>
+<li><p><strong>header</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="modules.preprocess.common.ChunkReadAndRunThread.run_each">
+<span class="sig-name descname"><span class="pre">run_each</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chunk_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">valid_pairs_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threads</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp_output_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp_output_pattern</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fun_thread</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fun_args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_combine</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.preprocess.common.ChunkReadAndRunThread.run_each" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>chunk_id</strong> – </p></li>
+<li><p><strong>valid_pairs_data</strong> – </p></li>
+<li><p><strong>threads</strong> – </p></li>
+<li><p><strong>output_file</strong> – </p></li>
+<li><p><strong>temp_output_dir</strong> – </p></li>
+<li><p><strong>temp_output_pattern</strong> – </p></li>
+<li><p><strong>fun_thread</strong> – </p></li>
+<li><p><strong>fun_args</strong> – </p></li>
+<li><p><strong>verbose</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="modules.preprocess.common.ChunkReadAndRunThread.write_output">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">write_output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'bed'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.preprocess.common.ChunkReadAndRunThread.write_output" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-modules.preprocess.extract_seqs">
+<span id="modules-preprocess-extract-seqs-module"></span><h2>modules.preprocess.extract_seqs module<a class="headerlink" href="#module-modules.preprocess.extract_seqs" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="modules.preprocess.extract_seqs.ExtractDatasets">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">modules.preprocess.extract_seqs.</span></span><span class="sig-name descname"><span class="pre">ExtractDatasets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">balanced_interaction_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raw_interaction_fasta_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">concat_reverse</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">equal_length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">padding</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compression</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">concat_epi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pretrained_vec_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_mer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encode_method</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threads</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chunk_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.preprocess.extract_seqs.ExtractDatasets" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#modules.preprocess.common.ChunkReadAndRunThread" title="modules.preprocess.common.ChunkReadAndRunThread"><code class="xref py py-class docutils literal notranslate"><span class="pre">ChunkReadAndRunThread</span></code></a></p>
+<p>Extract number encoded raw datasets (including inputs and labels) and corresponding fasta sequences</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="modules.preprocess.extract_seqs.ExtractDatasets.combine_interactions">
+<span class="sig-name descname"><span class="pre">combine_interactions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chunk_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp_output_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp_output_pattern</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.preprocess.extract_seqs.ExtractDatasets.combine_interactions" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>chunk_id</strong> – </p></li>
+<li><p><strong>output_file</strong> – </p></li>
+<li><p><strong>temp_output_dir</strong> – </p></li>
+<li><p><strong>temp_output_pattern</strong> – </p></li>
+<li><p><strong>verbose</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="modules.preprocess.extract_seqs.ExtractDatasets.encode_seq">
+<span class="sig-name descname"><span class="pre">encode_seq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">raw_seq</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.preprocess.extract_seqs.ExtractDatasets.encode_seq" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>raw_seq</strong> – </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="modules.preprocess.extract_seqs.ExtractDatasets.export_h5">
+<span class="sig-name descname"><span class="pre">export_h5</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_chunk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxshape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chunks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rewrite</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compression</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'gzip'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.preprocess.extract_seqs.ExtractDatasets.export_h5" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> – </p></li>
+<li><p><strong>dataset_name</strong> – </p></li>
+<li><p><strong>data_chunk</strong> – </p></li>
+<li><p><strong>maxshape</strong> – </p></li>
+<li><p><strong>chunks</strong> – </p></li>
+<li><p><strong>rewrite</strong> – </p></li>
+<li><p><strong>compression</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="modules.preprocess.extract_seqs.ExtractDatasets.extract_dataset">
+<span class="sig-name descname"><span class="pre">extract_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chunk_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">task_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.preprocess.extract_seqs.ExtractDatasets.extract_dataset" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>chunk_id</strong> – </p></li>
+<li><p><strong>task_id</strong> – </p></li>
+<li><p><strong>temp_data</strong> – </p></li>
+<li><p><strong>temp_file</strong> – </p></li>
+<li><p><strong>dataset_name</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="modules.preprocess.extract_seqs.ExtractDatasets.extract_seq">
+<span class="sig-name descname"><span class="pre">extract_seq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fasta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unique_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strand</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'+'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reverse</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.preprocess.extract_seqs.ExtractDatasets.extract_seq" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fasta</strong> – </p></li>
+<li><p><strong>unique_id</strong> – </p></li>
+<li><p><strong>strand</strong> – </p></li>
+<li><p><strong>reverse</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="modules.preprocess.extract_seqs.ExtractDatasets.extract_seqs">
+<span class="sig-name descname"><span class="pre">extract_seqs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp_data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.preprocess.extract_seqs.ExtractDatasets.extract_seqs" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>index</strong> – </p></li>
+<li><p><strong>temp_data</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="modules.preprocess.extract_seqs.ExtractDatasets.format_fasta">
+<span class="sig-name descname"><span class="pre">format_fasta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seq</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.preprocess.extract_seqs.ExtractDatasets.format_fasta" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – </p></li>
+<li><p><strong>seq</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="modules.preprocess.extract_seqs.ExtractDatasets.init_encoder">
+<span class="sig-name descname"><span class="pre">init_encoder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.preprocess.extract_seqs.ExtractDatasets.init_encoder" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>method</strong> – </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="modules.preprocess.extract_seqs.ExtractDatasets.init_interactions_fasta">
+<span class="sig-name descname"><span class="pre">init_interactions_fasta</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#modules.preprocess.extract_seqs.ExtractDatasets.init_interactions_fasta" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="modules.preprocess.extract_seqs.ExtractDatasets.init_k_mer">
+<span class="sig-name descname"><span class="pre">init_k_mer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kmer_str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.preprocess.extract_seqs.ExtractDatasets.init_k_mer" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kmer_str</strong> – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="modules.preprocess.extract_seqs.ExtractDatasets.process_seq">
+<span class="sig-name descname"><span class="pre">process_seq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">raw_seq</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.preprocess.extract_seqs.ExtractDatasets.process_seq" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>raw_seq</strong> – </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="modules.preprocess.extract_seqs.ExtractDatasets.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#modules.preprocess.extract_seqs.ExtractDatasets.run" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-modules.preprocess.filtration">
+<span id="modules-preprocess-filtration-module"></span><h2>modules.preprocess.filtration module<a class="headerlink" href="#module-modules.preprocess.filtration" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="modules.preprocess.filtration.FilterInteractions">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">modules.preprocess.filtration.</span></span><span class="sig-name descname"><span class="pre">FilterInteractions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_interaction</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interact_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">promoter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">within_compartment</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threads</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chunksize</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chrom_size_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">promoter_range</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">promoter_number</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distance_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_raw</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.preprocess.filtration.FilterInteractions" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#modules.preprocess.common.ChunkReadAndRunThread" title="modules.preprocess.common.ChunkReadAndRunThread"><code class="xref py py-class docutils literal notranslate"><span class="pre">ChunkReadAndRunThread</span></code></a></p>
+<p>Filtration of interactions by distance, genomic annotation, annotation number, interaction type, length</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>distance</strong> – their distance</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="modules.preprocess.filtration.FilterInteractions.create_annotation_db">
+<span class="sig-name descname"><span class="pre">create_annotation_db</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#modules.preprocess.filtration.FilterInteractions.create_annotation_db" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="modules.preprocess.filtration.FilterInteractions.create_promoter_db">
+<span class="sig-name descname"><span class="pre">create_promoter_db</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feature</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'bed'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotation_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'gtf'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.preprocess.filtration.FilterInteractions.create_promoter_db" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="modules.preprocess.filtration.FilterInteractions.filt_interactions">
+<span class="sig-name descname"><span class="pre">filt_interactions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chunk_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">task_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp_file</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.preprocess.filtration.FilterInteractions.filt_interactions" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="modules.preprocess.filtration.FilterInteractions.get_distance">
+<span class="sig-name descname"><span class="pre">get_distance</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#modules.preprocess.filtration.FilterInteractions.get_distance" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="modules.preprocess.filtration.FilterInteractions.get_within_compartment">
+<span class="sig-name descname"><span class="pre">get_within_compartment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">list2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.preprocess.filtration.FilterInteractions.get_within_compartment" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="modules.preprocess.filtration.FilterInteractions.get_within_promoter">
+<span class="sig-name descname"><span class="pre">get_within_promoter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">res1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">res2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.preprocess.filtration.FilterInteractions.get_within_promoter" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="modules.preprocess.filtration.FilterInteractions.get_within_promoter_num">
+<span class="sig-name descname"><span class="pre">get_within_promoter_num</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">promoter</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.preprocess.filtration.FilterInteractions.get_within_promoter_num" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="modules.preprocess.filtration.FilterInteractions.query_within_promoter">
+<span class="sig-name descname"><span class="pre">query_within_promoter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chrom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.preprocess.filtration.FilterInteractions.query_within_promoter" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="modules.preprocess.filtration.FilterInteractions.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#modules.preprocess.filtration.FilterInteractions.run" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-modules.preprocess.generate_compartments">
+<span id="modules-preprocess-generate-compartments-module"></span><h2>modules.preprocess.generate_compartments module<a class="headerlink" href="#module-modules.preprocess.generate_compartments" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="modules.preprocess.generate_compartments.GenerateCompartments">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">modules.preprocess.generate_compartments.</span></span><span class="sig-name descname"><span class="pre">GenerateCompartments</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">juicer_tools_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hic_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threads</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chrom_size_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bin_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_prefix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.preprocess.generate_compartments.GenerateCompartments" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="modules.preprocess.generate_compartments.GenerateCompartments.generate_compartments">
+<span class="sig-name descname"><span class="pre">generate_compartments</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">juicer_tools_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hic_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threads</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chroms</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bin_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'eigen_'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.preprocess.generate_compartments.GenerateCompartments.generate_compartments" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="modules.preprocess.generate_compartments.GenerateCompartments.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#modules.preprocess.generate_compartments.GenerateCompartments.run" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="modules.preprocess.generate_compartments.generate_compartments_each">
+<span class="sig-prename descclassname"><span class="pre">modules.preprocess.generate_compartments.</span></span><span class="sig-name descname"><span class="pre">generate_compartments_each</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">juicer_tools_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hic_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chrom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bin_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_file</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.preprocess.generate_compartments.generate_compartments_each" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-modules.preprocess.generate_interactions">
+<span id="modules-preprocess-generate-interactions-module"></span><h2>modules.preprocess.generate_interactions module<a class="headerlink" href="#module-modules.preprocess.generate_interactions" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="modules.preprocess.generate_interactions.GenerateInteractions">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">modules.preprocess.generate_interactions.</span></span><span class="sig-name descname"><span class="pre">GenerateInteractions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chrom_size_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">valid_pairs_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eigenvec_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eigenvec_file_pattern</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bin_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threads</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chunk_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_chrom_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">discard_chrom_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.preprocess.generate_interactions.GenerateInteractions" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="modules.preprocess.generate_interactions.GenerateInteractions.add_location">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">add_location</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chrom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chrom_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eigenvec_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bin_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'\t'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.preprocess.generate_interactions.GenerateInteractions.add_location" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>chrom</strong> – </p></li>
+<li><p><strong>chrom_size</strong> – </p></li>
+<li><p><strong>eigenvec_file</strong> – </p></li>
+<li><p><strong>bin_size</strong> – </p></li>
+<li><p><strong>sep</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="modules.preprocess.generate_interactions.GenerateInteractions.annotate_eigenvec">
+<span class="sig-name descname"><span class="pre">annotate_eigenvec</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#modules.preprocess.generate_interactions.GenerateInteractions.annotate_eigenvec" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="modules.preprocess.generate_interactions.GenerateInteractions.combine_eigenvec">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">combine_eigenvec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eigenvec_data_list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.preprocess.generate_interactions.GenerateInteractions.combine_eigenvec" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>eigenvec_data_list</strong> – </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="modules.preprocess.generate_interactions.GenerateInteractions.combine_interactions">
+<span class="sig-name descname"><span class="pre">combine_interactions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chunk_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp_output_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp_output_pattern</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.preprocess.generate_interactions.GenerateInteractions.combine_interactions" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>chunk_id</strong> – </p></li>
+<li><p><strong>output_file</strong> – </p></li>
+<li><p><strong>temp_output_dir</strong> – </p></li>
+<li><p><strong>temp_output_pattern</strong> – </p></li>
+<li><p><strong>verbose</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="modules.preprocess.generate_interactions.GenerateInteractions.generate_interactions">
+<span class="sig-name descname"><span class="pre">generate_interactions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chunk_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">task_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp_file</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.preprocess.generate_interactions.GenerateInteractions.generate_interactions" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>chunk_id</strong> – </p></li>
+<li><p><strong>temp_data</strong> – </p></li>
+<li><p><strong>task_id</strong> – </p></li>
+<li><p><strong>temp_file</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="modules.preprocess.generate_interactions.GenerateInteractions.merge_interactions">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">merge_interactions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotation_col</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.preprocess.generate_interactions.GenerateInteractions.merge_interactions" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="modules.preprocess.generate_interactions.GenerateInteractions.output_func">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">output_func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">line_break</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.preprocess.generate_interactions.GenerateInteractions.output_func" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>output_file</strong> – </p></li>
+<li><p><strong>content</strong> – </p></li>
+<li><p><strong>line_break</strong> – </p></li>
+<li><p><strong>init</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="modules.preprocess.generate_interactions.GenerateInteractions.query_compartment">
+<span class="sig-name descname"><span class="pre">query_compartment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chrom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_compartment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.preprocess.generate_interactions.GenerateInteractions.query_compartment" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="modules.preprocess.generate_interactions.GenerateInteractions.read_valid_pairs">
+<span class="sig-name descname"><span class="pre">read_valid_pairs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chunksize</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.preprocess.generate_interactions.GenerateInteractions.read_valid_pairs" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>chunksize</strong> – </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="modules.preprocess.generate_interactions.GenerateInteractions.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#modules.preprocess.generate_interactions.GenerateInteractions.run" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="modules.preprocess.generate_interactions.GenerateInteractions.run_each">
+<span class="sig-name descname"><span class="pre">run_each</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chunk_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">valid_pairs_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threads</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp_output_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp_output_pattern</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.preprocess.generate_interactions.GenerateInteractions.run_each" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>chunk_id</strong> – </p></li>
+<li><p><strong>valid_pairs_data</strong> – </p></li>
+<li><p><strong>threads</strong> – </p></li>
+<li><p><strong>output_file</strong> – </p></li>
+<li><p><strong>temp_output_dir</strong> – </p></li>
+<li><p><strong>temp_output_pattern</strong> – </p></li>
+<li><p><strong>verbose</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="modules.preprocess.generate_interactions.GenerateInteractions.write_output">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">write_output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'bed'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.preprocess.generate_interactions.GenerateInteractions.write_output" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> – </p></li>
+<li><p><strong>output</strong> – </p></li>
+<li><p><strong>format</strong> – </p></li>
+<li><p><strong>init</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-modules.preprocess">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-modules.preprocess" title="Permalink to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Hongfei Liu.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

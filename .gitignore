@@ -1,0 +1,21 @@
+# Default ignored files
+/shelf/
+/workspace.xml
+# Editor-based HTTP Client requests
+/httpRequests/
+# Datasource local storage ignored files
+/dataSources/
+/dataSources.local.xml
+# Zeppelin ignored files
+/ZeppelinRemoteNotebooks/
+# hidden files
+.git
+.idea
+.ipynb_checkpoints
+.token
+# temporary or data files
+__pycache__
+sample/
+input/
+temp/
+output/
