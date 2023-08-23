@@ -63,6 +63,7 @@
 <li><a class="reference internal" href="#modules.utils.encode.DNA2VecEncoder.fit"><code class="docutils literal notranslate"><span class="pre">DNA2VecEncoder.fit()</span></code></a></li>
 <li><a class="reference internal" href="#modules.utils.encode.DNA2VecEncoder.generate_k_mers"><code class="docutils literal notranslate"><span class="pre">DNA2VecEncoder.generate_k_mers()</span></code></a></li>
 <li><a class="reference internal" href="#modules.utils.encode.DNA2VecEncoder.get_vector_each"><code class="docutils literal notranslate"><span class="pre">DNA2VecEncoder.get_vector_each()</span></code></a></li>
+<li><a class="reference internal" href="#modules.utils.encode.DNA2VecEncoder.preprocess"><code class="docutils literal notranslate"><span class="pre">DNA2VecEncoder.preprocess()</span></code></a></li>
 <li><a class="reference internal" href="#modules.utils.encode.DNA2VecEncoder.transform"><code class="docutils literal notranslate"><span class="pre">DNA2VecEncoder.transform()</span></code></a></li>
 </ul>
 </li>
@@ -71,6 +72,7 @@
 <li><a class="reference internal" href="#module-modules.utils.memory">modules.utils.memory module</a><ul>
 <li><a class="reference internal" href="#modules.utils.memory.MemoryUseReporter"><code class="docutils literal notranslate"><span class="pre">MemoryUseReporter</span></code></a><ul>
 <li><a class="reference internal" href="#modules.utils.memory.MemoryUseReporter.get_memory"><code class="docutils literal notranslate"><span class="pre">MemoryUseReporter.get_memory()</span></code></a></li>
+<li><a class="reference internal" href="#modules.utils.memory.MemoryUseReporter.get_memory_byte"><code class="docutils literal notranslate"><span class="pre">MemoryUseReporter.get_memory_byte()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#modules.utils.memory.convert_bytes_to_human_readable"><code class="docutils literal notranslate"><span class="pre">convert_bytes_to_human_readable()</span></code></a></li>
@@ -89,6 +91,9 @@
 <li><a class="reference internal" href="#module-modules.utils.timer">modules.utils.timer module</a><ul>
 <li><a class="reference internal" href="#modules.utils.timer.Timer"><code class="docutils literal notranslate"><span class="pre">Timer</span></code></a><ul>
 <li><a class="reference internal" href="#modules.utils.timer.Timer.elapsed_time"><code class="docutils literal notranslate"><span class="pre">Timer.elapsed_time()</span></code></a></li>
+<li><a class="reference internal" href="#modules.utils.timer.Timer.final_elapsed_time"><code class="docutils literal notranslate"><span class="pre">Timer.final_elapsed_time()</span></code></a></li>
+<li><a class="reference internal" href="#modules.utils.timer.Timer.final_start"><code class="docutils literal notranslate"><span class="pre">Timer.final_start()</span></code></a></li>
+<li><a class="reference internal" href="#modules.utils.timer.Timer.final_stop"><code class="docutils literal notranslate"><span class="pre">Timer.final_stop()</span></code></a></li>
 <li><a class="reference internal" href="#modules.utils.timer.Timer.start"><code class="docutils literal notranslate"><span class="pre">Timer.start()</span></code></a></li>
 <li><a class="reference internal" href="#modules.utils.timer.Timer.stop"><code class="docutils literal notranslate"><span class="pre">Timer.stop()</span></code></a></li>
 </ul>
@@ -102,15 +107,18 @@
 <li><a class="reference internal" href="#modules.utils.tools.check_gff_db"><code class="docutils literal notranslate"><span class="pre">check_gff_db()</span></code></a></li>
 <li><a class="reference internal" href="#modules.utils.tools.create_gff_db"><code class="docutils literal notranslate"><span class="pre">create_gff_db()</span></code></a></li>
 <li><a class="reference internal" href="#modules.utils.tools.filt_chrom"><code class="docutils literal notranslate"><span class="pre">filt_chrom()</span></code></a></li>
+<li><a class="reference internal" href="#modules.utils.tools.format_dict_to_filename"><code class="docutils literal notranslate"><span class="pre">format_dict_to_filename()</span></code></a></li>
 <li><a class="reference internal" href="#modules.utils.tools.format_location"><code class="docutils literal notranslate"><span class="pre">format_location()</span></code></a></li>
 <li><a class="reference internal" href="#modules.utils.tools.fprint"><code class="docutils literal notranslate"><span class="pre">fprint()</span></code></a></li>
 <li><a class="reference internal" href="#modules.utils.tools.fprint_step"><code class="docutils literal notranslate"><span class="pre">fprint_step()</span></code></a></li>
 <li><a class="reference internal" href="#modules.utils.tools.get_intersection"><code class="docutils literal notranslate"><span class="pre">get_intersection()</span></code></a></li>
 <li><a class="reference internal" href="#modules.utils.tools.human_read_length"><code class="docutils literal notranslate"><span class="pre">human_read_length()</span></code></a></li>
 <li><a class="reference internal" href="#modules.utils.tools.initialize_all_tasks"><code class="docutils literal notranslate"><span class="pre">initialize_all_tasks()</span></code></a></li>
+<li><a class="reference internal" href="#modules.utils.tools.isNumber"><code class="docutils literal notranslate"><span class="pre">isNumber()</span></code></a></li>
 <li><a class="reference internal" href="#modules.utils.tools.listen_batch"><code class="docutils literal notranslate"><span class="pre">listen_batch()</span></code></a></li>
 <li><a class="reference internal" href="#modules.utils.tools.mean"><code class="docutils literal notranslate"><span class="pre">mean()</span></code></a></li>
 <li><a class="reference internal" href="#modules.utils.tools.read_chrom_size"><code class="docutils literal notranslate"><span class="pre">read_chrom_size()</span></code></a></li>
+<li><a class="reference internal" href="#modules.utils.tools.read_config_file"><code class="docutils literal notranslate"><span class="pre">read_config_file()</span></code></a></li>
 <li><a class="reference internal" href="#modules.utils.tools.read_gff"><code class="docutils literal notranslate"><span class="pre">read_gff()</span></code></a></li>
 <li><a class="reference internal" href="#modules.utils.tools.read_list_file"><code class="docutils literal notranslate"><span class="pre">read_list_file()</span></code></a></li>
 </ul>
@@ -202,7 +210,7 @@
 <span id="modules-utils-encode-module"></span><h2>modules.utils.encode module<a class="headerlink" href="#module-modules.utils.encode" title="Permalink to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="modules.utils.encode.DNA2VecEncoder">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">modules.utils.encode.</span></span><span class="sig-name descname"><span class="pre">DNA2VecEncoder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pretrained_vec_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threads</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.utils.encode.DNA2VecEncoder" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">modules.utils.encode.</span></span><span class="sig-name descname"><span class="pre">DNA2VecEncoder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pretrained_vec_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threads</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_len</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pad_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.utils.encode.DNA2VecEncoder" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="modules.utils.encode.DNA2VecEncoder.fit">
@@ -220,8 +228,13 @@
 <dd></dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="modules.utils.encode.DNA2VecEncoder.preprocess">
+<span class="sig-name descname"><span class="pre">preprocess</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">raw_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_len</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.utils.encode.DNA2VecEncoder.preprocess" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="modules.utils.encode.DNA2VecEncoder.transform">
-<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#modules.utils.encode.DNA2VecEncoder.transform" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_len</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.utils.encode.DNA2VecEncoder.transform" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -236,6 +249,11 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="modules.utils.memory.MemoryUseReporter.get_memory">
 <span class="sig-name descname"><span class="pre">get_memory</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#modules.utils.memory.MemoryUseReporter.get_memory" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="modules.utils.memory.MemoryUseReporter.get_memory_byte">
+<span class="sig-name descname"><span class="pre">get_memory_byte</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#modules.utils.memory.MemoryUseReporter.get_memory_byte" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -297,6 +315,23 @@
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="modules.utils.timer.Timer.final_elapsed_time">
+<span class="sig-name descname"><span class="pre">final_elapsed_time</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#modules.utils.timer.Timer.final_elapsed_time" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="modules.utils.timer.Timer.final_start">
+<span class="sig-name descname"><span class="pre">final_start</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#modules.utils.timer.Timer.final_start" title="Permalink to this definition"></a></dt>
+<dd><p>开始计时</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="modules.utils.timer.Timer.final_stop">
+<span class="sig-name descname"><span class="pre">final_stop</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#modules.utils.timer.Timer.final_stop" title="Permalink to this definition"></a></dt>
+<dd><p>结束计时</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="modules.utils.timer.Timer.start">
 <span class="sig-name descname"><span class="pre">start</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#modules.utils.timer.Timer.start" title="Permalink to this definition"></a></dt>
 <dd><p>开始计时</p>
@@ -315,7 +350,7 @@
 <span id="modules-utils-tools-module"></span><h2>modules.utils.tools module<a class="headerlink" href="#module-modules.utils.tools" title="Permalink to this heading"></a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="modules.utils.tools.auto_type">
-<span class="sig-prename descclassname"><span class="pre">modules.utils.tools.</span></span><span class="sig-name descname"><span class="pre">auto_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.utils.tools.auto_type" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">modules.utils.tools.</span></span><span class="sig-name descname"><span class="pre">auto_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_int</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.utils.tools.auto_type" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
@@ -344,6 +379,11 @@ return batch_tasks, list in list</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="modules.utils.tools.filt_chrom">
 <span class="sig-prename descclassname"><span class="pre">modules.utils.tools.</span></span><span class="sig-name descname"><span class="pre">filt_chrom</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chrom_size_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_chrom_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">discard_chrom_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.utils.tools.filt_chrom" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="modules.utils.tools.format_dict_to_filename">
+<span class="sig-prename descclassname"><span class="pre">modules.utils.tools.</span></span><span class="sig-name descname"><span class="pre">format_dict_to_filename</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.utils.tools.format_dict_to_filename" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
@@ -377,6 +417,11 @@ return batch_tasks, list in list</p>
 <dd></dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="modules.utils.tools.isNumber">
+<span class="sig-prename descclassname"><span class="pre">modules.utils.tools.</span></span><span class="sig-name descname"><span class="pre">isNumber</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.utils.tools.isNumber" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="modules.utils.tools.listen_batch">
 <span class="sig-prename descclassname"><span class="pre">modules.utils.tools.</span></span><span class="sig-name descname"><span class="pre">listen_batch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">thread_pool_list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.utils.tools.listen_batch" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
@@ -389,6 +434,11 @@ return batch_tasks, list in list</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="modules.utils.tools.read_chrom_size">
 <span class="sig-prename descclassname"><span class="pre">modules.utils.tools.</span></span><span class="sig-name descname"><span class="pre">read_chrom_size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chrom_size_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'chrom'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.utils.tools.read_chrom_size" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="modules.utils.tools.read_config_file">
+<span class="sig-prename descclassname"><span class="pre">modules.utils.tools.</span></span><span class="sig-name descname"><span class="pre">read_config_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'hyper_parameters-config.txt'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#modules.utils.tools.read_config_file" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">

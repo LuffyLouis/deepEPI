@@ -7,6 +7,34 @@ import gffutils
 import pandas as pd
 from Bio import SeqFeature
 
+def format_dict_to_filename(input_dict):
+    formatted_filename = ""
+    for key, value in input_dict.items():
+        key = str(key).replace(' ', '_').replace('.', '_').replace('-', '_')
+        value = str(value).replace(' ', '_').replace('.', '_').replace('-', '_')
+        formatted_filename += f"{key}_{value}_"
+    return formatted_filename.rstrip('_')  # 去除末尾的下划线
+
+def isNumber(f):
+    return all([p.isdigit() for p in [f[:f.find('.')], f[f.find('.')+1:]] if len(p)])
+
+def read_config_file(filename="hyper_parameters-config.txt"):
+    config_dict = {}
+
+    with open(filename, 'r') as file:
+        for line in file:
+            line = line.strip()
+            if line:
+                key, val = line.split(':')
+                key = key.strip().replace(" ","")
+                val = val.strip().replace(" ","")
+
+                if not val:
+                    config_dict[key] = []
+                else:
+                    config_dict[key] = [auto_type(i,return_int=False) for i in val.split(",")]
+
+    return config_dict
 
 def fprint(type="LOG", msg=''):
     print("{}|[{}]: {}" \
@@ -68,9 +96,12 @@ def mean(object):
         raise "Not supported data type"
     pass
 # 自定义参数类型转换函数
-def auto_type(s):
-    if s.isdigit():  # 判断是否为数字
-        return int(s)  # 如果是数字，则转换为整数类型
+def auto_type(s,return_int=True):
+    if isNumber(s):
+        if return_int:  # 判断是否为数字
+            return int(s)
+        else:
+            return float(s)
     else:
         return s  # 否则返回字符串类型
 

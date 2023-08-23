@@ -32,11 +32,11 @@ class MultiKModel:
         """
         return self.data[k_len].model
 
-    def vector(self, vocab):
+    def vector(self, vocab,pad_idx=0):
         if vocab in self.aggregate.key_to_index.keys():
             return self.data[len(vocab)].model[vocab]
         else:
-            return np.array([0]*self.vec_dim).reshape(self.vec_dim,)
+            return np.array([pad_idx]*self.vec_dim).reshape(self.vec_dim,)
 
     def unitvec(self, vec):
         return matutils.unitvec(vec)

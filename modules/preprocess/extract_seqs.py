@@ -14,7 +14,7 @@ from modules.utils import *
 
 ## Step to extract encoded datasets and corresponding fasta sequences
 from modules.utils.encode import DNA2VecEncoder
-from modules.utils.memory import MemoryUseReporter
+from modules.utils.memory import MemoryUseReporter, convert_bytes_to_human_readable
 
 
 class ExtractDatasets(ChunkReadAndRunThread):
@@ -23,7 +23,7 @@ class ExtractDatasets(ChunkReadAndRunThread):
 
     """
     def __init__(self, balanced_interaction_file, raw_interaction_fasta_file, dataset_name, concat_reverse,
-                 equal_length, trim, padding, compression, concat_epi, pretrained_vec_file, k_mer,
+                 enhancer_length,promoter_length, trim, padding, compression, concat_epi, pretrained_vec_file, k_mer,
                  encode_method, temp_dir, output_dir, output, threads, chunk_size, verbose):
         super().__init__()
 
@@ -46,7 +46,8 @@ class ExtractDatasets(ChunkReadAndRunThread):
         self.balanced_interaction_file = balanced_interaction_file
         self.raw_interaction_fasta_file = raw_interaction_fasta_file
         self.concat_reverse = concat_reverse
-        self.equal_length, self.trim, self.padding = int(equal_length), trim, padding
+        self.enhancer_length, self.trim, self.padding = int(enhancer_length), trim, padding
+        self.promoter_length = int(promoter_length)
         self.encode_method = encode_method
         self.compression = compression
         self.concat_epi = concat_epi
@@ -130,13 +131,14 @@ class ExtractDatasets(ChunkReadAndRunThread):
         if method.lower() == "onehot" or method.lower() == "one-hot":
             encoder = OneHotEncoder()
             encoder.fit(self.seq_encode_mode)
+            # encoder.tr
             return encoder
         elif method.lower() == "dna2vec":
             encoder = DNA2VecEncoder(self.pretrained_vec_file, self.k_mer, self.threads)
             return encoder
         pass
 
-    def encode_seq(self, raw_seq):
+    def encode_seq(self, raw_seq, max_len=None):
         """
 
         :param raw_seq:
@@ -147,7 +149,7 @@ class ExtractDatasets(ChunkReadAndRunThread):
             return self.encoder.transform(np.array(list(raw_seq)).reshape(-1, 1)).toarray()
         else:
             self.encoder.fit(raw_seq)
-            return self.encoder.transform()
+            return self.encoder.transform(max_len)
 
     def export_h5(self, filename, dataset_name, data_chunk, maxshape=None, chunks=True, rewrite=True,
                   compression="gzip"):
@@ -203,21 +205,21 @@ class ExtractDatasets(ChunkReadAndRunThread):
         # fcntl.flock(self.file_descriptor, fcntl.LOCK_UN)
         pass
 
-    def process_seq(self, raw_seq):
+    def process_seq(self, raw_seq, final_length):
         """
 
         :param raw_seq:
         :return:
         """
-        if len(raw_seq) >= self.equal_length:
-            res_seq = trim_string_to_length(raw_seq, self.equal_length, side=self.trim.lower())
+        if len(raw_seq) >= final_length:
+            res_seq = trim_string_to_length(raw_seq, final_length, side=self.trim.lower())
         else:
             if self.padding.lower() == "left":
-                res_seq = left_pad_string(raw_seq, self.equal_length)
+                res_seq = left_pad_string(raw_seq, final_length)
             elif self.padding.lower() == "right":
-                res_seq = right_pad_string(raw_seq, self.equal_length)
+                res_seq = right_pad_string(raw_seq, final_length)
             else:
-                res_seq = center_pad_string(raw_seq, self.equal_length)
+                res_seq = center_pad_string(raw_seq, final_length)
         return res_seq
         # pass
 
@@ -238,15 +240,23 @@ class ExtractDatasets(ChunkReadAndRunThread):
                 all_valid_files.append(file)
                 count += 1
         fprint("LOG", "Finding {} temp output files".format(count))
+        shape_total_raw = 0
+        shape_total = 0
         for index, file_name in enumerate(all_valid_files):
             temp_file = os.path.join(temp_output_dir, file_name)
             with h5py.File(temp_file, "r") as h5_file:
-                for dataset_name in h5_file:
-
+                for i,dataset_name in enumerate(h5_file):
+                    # print(dataset_name)
                     if verbose:
                         fprint("LOG", "Combing the {}-th file".format(index))
                     dataset = h5_file[dataset_name]
-                    if index == 0:
+                    if dataset_name == "raw":
+                        shape_total_raw += dataset.shape[0]
+                        print("shape_total_raw:{}".format(shape_total_raw))
+                    else:
+                        shape_total += dataset.shape[0]
+                        print("shape_total:{}".format(shape_total))
+                    if index == 0 and i == 0:
                         self.export_h5(output_file, dataset_name, dataset, maxshape=(None, None, None), rewrite=True,
                                        compression=self.compression)
                     else:
@@ -294,13 +304,30 @@ class ExtractDatasets(ChunkReadAndRunThread):
             unique_id2 = format_location(
                 [temp_data.loc[i, "chrom2"], temp_data.loc[i, "start2"], temp_data.loc[i, "end2"]])
             strand2 = temp_data.loc[i, "strand2"]
+            if temp_data.loc[i,"promoter"] == "0,1":
+                enhancer_index = 0
+                promoter_index = 1
+            elif temp_data.loc[i, "promoter"] == "1,0":
+                enhancer_index = 1
+                promoter_index = 0
+                pass
+            else:
+                enhancer_index = 0
+                promoter_index = 1
+                # fprint("WARNING",msg="it is not the enhancer-promoter pair for {}, so skip!!! ".format(temp_data.loc[i,"reads_name"]))
+                # continue
+                pass
 
-            seq1 = self.extract_seq(raw_interactions_fasta, unique_id1, strand1)
-            seq2 = self.extract_seq(raw_interactions_fasta, unique_id2, strand2)
+            enhancer_id = [unique_id1, unique_id2][enhancer_index]
+            promoter_id = [unique_id1, unique_id2][promoter_index]
+            enhancer_strand = [strand1,strand2][enhancer_index]
+            promoter_strand = [strand1,strand2][promoter_index]
+            enhancer_seq = self.extract_seq(raw_interactions_fasta, enhancer_id, enhancer_strand)
+            promoter_seq = self.extract_seq(raw_interactions_fasta, promoter_id, promoter_strand)
 
             ##
-            seq1_encoded = self.encode_seq(self.process_seq(seq1))
-            seq2_encoded = self.encode_seq(self.process_seq(seq2))
+            seq1_encoded = self.encode_seq(self.process_seq(enhancer_seq, self.enhancer_length), self.enhancer_length)
+            seq2_encoded = self.encode_seq(self.process_seq(promoter_seq, self.promoter_length), self.promoter_length)
             # print(seq1_encoded.toarray())
             # print("-----------------")
             # print(seq1_encoded.shape)
@@ -308,24 +335,29 @@ class ExtractDatasets(ChunkReadAndRunThread):
             # if self.encode_method.lower() == "onehot":
             if self.concat_epi:
                 # fprint("WARNING","The EPI sequences would not be concat in output dataset!!")
-                seq_concat = np.c_[seq1_encoded, seq2_encoded]
+                seq_concat = np.r_[seq1_encoded, seq2_encoded]
+                # print(seq_concat.shape)
             # else:
             #     seq_concat = np.r_[seq1_encoded, seq2_encoded]
 
             if self.concat_reverse:
-                seq1_reverse = self.extract_seq(raw_interactions_fasta, unique_id1, strand1, reverse=True)
-                seq2_reverse = self.extract_seq(raw_interactions_fasta, unique_id1, strand1, reverse=True)
-                seq1_reverse_encoded = self.encode_seq(self.process_seq(seq1_reverse))
-                seq2_reverse_encoded = self.encode_seq(self.process_seq(seq2_reverse))
+                print("asdsadsa")
+                seq1_reverse = self.extract_seq(raw_interactions_fasta, enhancer_id, enhancer_strand, reverse=True)
+                seq2_reverse = self.extract_seq(raw_interactions_fasta, promoter_id, promoter_strand, reverse=True)
+                seq1_reverse_encoded = self.encode_seq(self.process_seq(seq1_reverse,self.enhancer_length), self.enhancer_length)
+                seq2_reverse_encoded = self.encode_seq(self.process_seq(seq2_reverse,self.promoter_length), self.promoter_length)
                 # if self.encode_method.lower() == "onehot":
-                seq_reverse_concat = np.c_[seq1_reverse_encoded, seq2_reverse_encoded]
                 if self.concat_epi:
+                    seq_reverse_concat = np.r_[seq1_reverse_encoded, seq2_reverse_encoded]
+                # if self.concat_reverse:
                     seq_concat = np.c_[seq_concat, seq_reverse_concat]
-                # else:
-                #     seq_reverse_concat = np.r_[seq1_reverse_encoded, seq2_reverse_encoded]
-                #     seq_concat = np.r_[seq_concat, seq_reverse_concat]
+                else:
+                    seq1_encoded = np.c_[seq1_encoded, seq1_reverse_encoded]
+                    seq2_encoded = np.c_[seq2_encoded, seq2_reverse_encoded]
+                    # seq_concat = np.r_[seq_concat, seq_reverse_concat]
 
             if self.concat_epi:
+                print(seq_concat.shape)
                 data_chunk.append(seq_concat)
             else:
                 data_chunk_seq1.append(seq1_encoded)
@@ -337,6 +369,7 @@ class ExtractDatasets(ChunkReadAndRunThread):
         ## encode seqs and convert them into h5 format
         label = np.array(temp_data.loc[:, "label"]).reshape((-1, 1, 1))
         data_chunk = np.array(data_chunk)
+        print(data_chunk.shape)
         data_chunk_seq1 = np.array(data_chunk_seq1)
         data_chunk_seq2 = np.array(data_chunk_seq2)
 
@@ -347,9 +380,9 @@ class ExtractDatasets(ChunkReadAndRunThread):
             self.export_h5(temp_file, dataset_name, data_chunk, chunks=False, compression=None)
 
         else:
-            self.export_h5(temp_file, dataset_name + "_seq1", data_chunk_seq1, chunks=False, rewrite=False,
+            self.export_h5(temp_file, dataset_name + "_enhancer", data_chunk_seq1, chunks=False, rewrite=False,
                            compression=None)
-            self.export_h5(temp_file, dataset_name + "_seq2", data_chunk_seq2, chunks=False, rewrite=False,
+            self.export_h5(temp_file, dataset_name + "_promoter", data_chunk_seq2, chunks=False, rewrite=False,
                            compression=None)
         self.export_h5(temp_file, dataset_name + "_label", label, chunks=False, rewrite=False, compression=None)
         # self.mutex.release()
@@ -433,5 +466,6 @@ class ExtractDatasets(ChunkReadAndRunThread):
 
         self.timer.stop()
         fprint(msg="Complete done! Elapsed time: {:.3f}s".format(self.timer.elapsed_time()))
-        fprint(msg="Memory usage at maximum: {}".format(max(self.memory_use_list)))
+        # print(self.memory_use_list)
+        fprint(msg="Memory usage at maximum: {}".format(convert_bytes_to_human_readable(max(self.memory_use_list))))
         pass

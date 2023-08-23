@@ -141,7 +141,7 @@ class ChunkReadAndRunThread:
             complete = listen_batch(self.thread_pool_list)
 
             fprint(msg="Memory use: {}".format(self.memory_use_reporter.get_memory()))
-            self.memory_use_list.append(self.memory_use_reporter.get_memory())
+            self.memory_use_list.append(self.memory_use_reporter.get_memory_byte())
             time.sleep(self.report_interval)
             # complete = True
             if complete:

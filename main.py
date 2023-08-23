@@ -5,23 +5,34 @@ import argparse
 import traceback
 import sys
 # import os
-
+from modules.datasets.prep_datasets import PrepDatasets
+from modules.models.training_model import TrainModel
 from modules.preprocess import generate_compartments, generate_interactions, filtration, balance, extract_seqs
 from modules.logger import progress_logger
 from modules.utils import *
 # from modules.utils.tools import print_pixel_title
-
-print("""
+#
+# print("""
+# ██████╗ ███████╗███████╗██████╗ ███████╗██████╗ ██╗
+# ██╔══██╗██╔════╝██╔════╝██╔══██╗██╔════╝██╔══██╗██║
+# ██║  ██║█████╗  █████╗  ██████╔╝█████╗  ██████╔╝██║
+# ██║  ██║██╔══╝  ██╔══╝  ██╔═══╝ ██╔══╝  ██╔═══╝ ██║
+# ██████╔╝███████╗███████╗██║     ███████╗██║     ██║
+# ╚═════╝ ╚══════╝╚══════╝╚═╝     ╚══════╝╚═╝     ╚═╝
+# """)
+parser = argparse.ArgumentParser(description="""
 ██████╗ ███████╗███████╗██████╗ ███████╗██████╗ ██╗
 ██╔══██╗██╔════╝██╔════╝██╔══██╗██╔════╝██╔══██╗██║
 ██║  ██║█████╗  █████╗  ██████╔╝█████╗  ██████╔╝██║
 ██║  ██║██╔══╝  ██╔══╝  ██╔═══╝ ██╔══╝  ██╔═══╝ ██║
 ██████╔╝███████╗███████╗██║     ███████╗██║     ██║
 ╚═════╝ ╚══════╝╚══════╝╚═╝     ╚══════╝╚═╝     ╚═╝
-""")
-parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
+""",
+                                 formatter_class=argparse.RawTextHelpFormatter)
 # print_pixel_title("Welcome to My Program")
 # parser.description =
+
+# parser.add_argument("-h", "--help", action="help", help="查看帮助信息")
 
 # parser.usage
 subparsers = parser.add_subparsers(title="Module",dest="module",help="Run specific module to run. The following modules are provided (note: if the main module was specified, all steps in this main module will be implemented):\n"
@@ -136,7 +147,9 @@ preprocess_group = preprocess_module.add_argument_group("extract_dataset")
 preprocess_group.add_argument("--raw_interaction_fasta_file",help="the fasta file for raw interactions")
 preprocess_group.add_argument("--dataset_name",default="raw", help="the encoded seqs dataset name in .h5 file\n"
                                                      "default=raw")
-preprocess_group.add_argument("--equal_length",type=float,default=2e3, help="the equal length to adjust the raw sequence by padding or triming strategy\n"
+preprocess_group.add_argument("--enhancer_length",type=float,default=4e3, help="the length to adjust the raw enhancer sequence by padding or triming strategy\n"
+                                                     "default=2e3")
+preprocess_group.add_argument("--promoter_length",type=float,default=2e3, help="the length to adjust the raw promoter sequence by padding or triming strategy\n"
                                                      "default=2e3")
 preprocess_group.add_argument("--trim",default="both", help="the triming strategy\n"
                                                             "optional parameters: left, right, both\n"
@@ -156,16 +169,130 @@ preprocess_group.add_argument("--k_mer", default=6, help="the k value of k-mer o
 # pretrained_vec_file,k_mer,
 # preprocess_group.add_argument("--promoter_length",type=float,default=, help="the strategy to pad the incomplete sequence\n"
 #                                                      "default=raw")
-preprocess_group.add_argument("--concat_reverse",action="store_true",help="whether to concat the interaction sequences with reverse strand\n"
+preprocess_group.add_argument("--concat_reverse",action="store_true",default=False,help="whether to concat the interaction sequences with reverse strand\n"
                                                                    )
-preprocess_group.add_argument("--concat_epi", action="store_true",help="whether to concat the enhancer and promoter together\n"
+preprocess_group.add_argument("--concat_epi", action="store_true",default=False,help="whether to concat the enhancer and promoter together\n"
                                                                "If not, the {dataset_name}_seq1 and {dataset_name}_seq2 will be generated separately\n"
                                                                )
 preprocess_group.add_argument("--encode_method",default="dna2vec", help="the encode method to encode raw sequences\n"
                                                                          "optional parameters: onehot, dna2vec\n"
                                                                         "default=True"
                                                     )
+datasets_module = subparsers.add_parser('Datasets',formatter_class=argparse.RawTextHelpFormatter)
+datasets_module.add_argument("-i", "--input",help="input file")
+datasets_module.add_argument("-s", "--step",help="the specific step to run")
+datasets_module.add_argument("--split",default="8:2",help="the training:validation:test ratio\n"
+                                            "the split ratio must be separated by colon\n"
+                                            "e.g. 8:2 (default)")
+datasets_module.add_argument("--key",help="the specific step to run")
+datasets_module.add_argument("--chunksize",type=float,default=1e3,help="chunksize (default=1e5)")
+datasets_module.add_argument("--test_size",type=float,default=0.2,help="the specific step to run")
+datasets_module.add_argument("--output_format",default="torch",help="(deprecated) the specific step to run")
+datasets_module.add_argument("--random_state",type=int,default=0,help="the random state to randomly split raw datasets\n"
+                                                            "default=0")
+datasets_module.add_argument("--output_prefix",help="the output file path and filename prefix")
+datasets_module.add_argument("--compression",type=auto_type,default="gzip",help="the compression method or level \n"
+                                                                                "(the detailed description can be found in the help page of Preprocess module)\n"
+                                                                                "default: gzip")
 
+# datasets_module.add_argument("", help="")
+
+datasets_module.add_argument("--verbose", action="store_true", default=False, help="whether to open the verbose mode")
+train_module = subparsers.add_parser("Train",formatter_class=argparse.RawTextHelpFormatter)
+train_module.add_argument("-i","--input",help="input .h5 file for training")
+train_module.add_argument("--test_input",default=None,help="input .h5 file for test")
+
+train_module.add_argument("--train_dataset_dir",help="the directory for .h5 files")
+train_module.add_argument("--train_dataset_pattern",help="the RegExp pattern of input .h5 files")
+train_module.add_argument("--workers",type=int,default=0,help="the workers to load dataset")
+
+train_module.add_argument("--model",help="the model selected to train\n"
+                                         "optional: \n"
+                                         "  simpleCNN\n"
+                                         "  CNN\n"
+                                         "  EPI-Mind")
+train_module.add_argument("--encode_method",default="onehot",help="the RegExp pattern of input .h5 files")
+train_module.add_argument("--concat_reverse",action="store_true",default=False,help="the RegExp pattern of input .h5 files")
+# encode_method,concat_reverse
+train_module.add_argument("--is_param_optim",action="store_true",default=False,help="whether to optimize the hyper-parameters")
+train_module.add_argument("--param_optim_strategy",help="the strategy for hyper-parameters optimization\n"
+                                                        "optional:\n"
+                                                        "   random: randomized parameters optimization\n"
+                                                        "   grid: grid parameters optimization")
+train_module.add_argument("--params_config",default="config.txt",help="the config file for hyper-parameters optimization")
+train_module.add_argument("--random_size",type=int,default=12,help="the size of random hyper-parameters optimization in random parameters optimization strategy\n"
+                                                                   "default=12")
+
+train_module.add_argument("--init_points",type=int,default=5,help="the step of random search in bayes optimization\n"
+                                                                   "default=5")
+train_module.add_argument("--n_iter",type=int,default=10,help="the number of bayes iterations\n"
+                                                                   "default=10")
+train_module.add_argument("--k_fold",type=int,default=None,help="the number of k-fold cross validation (CV)")
+train_module.add_argument("--metrics",default="auc",help="the average value of metric for evaluating this model in k fold CV\n"
+                                                         "optional: \n"
+                                                         "  auc: the area under curve for ROC curve\n"
+                                                         "  f1: a systematic metric considering precision and recall\n"
+                                                         "  acc: the accuracy at test dataset")
+train_module.add_argument("--save_fig",default="fig.pdf",help="whether to save fig and corresponding save path:\n"
+                                                              "default: fig.pdf")
+train_module.add_argument("--init",default="",help="the initialization method for parameters in model\n"
+                                                   "optional: \n"
+                                                   "    zeros: all zeros initialization\n"
+                                                   "    normal: initialization parameters conform to general normalization distribution\n"
+                                                   "    uniform: initialization parameters conform to uniform distribution\n"
+                                                   "    xavier_normal: Xavier normal initialization\n"
+                                                   "    kaiming_normal: Kaiming normal initialization\n"
+                                                   "    xavier_uniform: Xavier uniform initialization\n"
+                                                   "    kaiming_uniform: Kaiming uniform initialization")
+train_module.add_argument("--epochs",type=int,default=10,help="the epochs (default=10)")
+train_module.add_argument("--lr",type=float,default=0.001,help="learning rate (default=0.001)")
+train_module.add_argument("--optimizer",default="SGD",help="the optimizer to implement the parameters optimization\n"
+                                                           "optional: \n"
+                                                           "    SGD: stochastic gradient descent\n"
+                                                           "    Adam: Adaptive Moment Estimation\n"
+                                                           "    Adagrad: Adaptive gradient\n"
+                                                           "    Adadelta: Adaptive delta (Hinton, 2012)\n"
+                                                           "    RMSprop: Root mean square prop\n"
+                                                           "    ASGD: Averaged Stochastic Gradient Descent\n"
+                                                           "    LBFGS: Limited-memory BFGS\n"
+                                                           "    ...")
+train_module.add_argument("--batch_size",type=int,default=32,help="batch size (default=32)")
+train_module.add_argument("--momentum",type=float,default=0.9,help="momentum in optimizer")
+train_module.add_argument("--weight_decay",type=float,default=0.9,help="weight_decay in optimizer")
+train_module.add_argument("--nesterov",action="store_true",default=False,help="nesterov vector in optimizer")
+train_module.add_argument("--betas",type=tuple,default=(0.9, 0.999),help="betas in optimizer")
+train_module.add_argument("--eps",type=float,default=1e-8,help="eps in optimizer")
+train_module.add_argument("--lr_decay",type=float,default=0,help="lr_decay in optimizer")
+train_module.add_argument("--initial_accumulator_value",type=float,default=0,help="initial_accumulator_value in optimizer")
+
+train_module.add_argument("--rho",type=float,default=0.9,help="rho in optimizer")
+train_module.add_argument("--alpha",type=float,default=0.99,help="alpha in optimizer")
+train_module.add_argument("--lambd",type=float,default=0.0001,help="lambd in optimizer")
+train_module.add_argument("--t0",type=float,default=1e6,help="t0 in optimizer")
+train_module.add_argument("--max_iter",type=int,default=20,help="momentum in optimizer LBFGS")
+train_module.add_argument("--max_eval",type=int,default=None,help="max_eval in optimizer LBFGS")
+# weight_decay, nesterov, betas, eps, lr_decay, initial_accumulator_value, rho, alpha,
+#                  lambd, t0, max_iter, max_eval,
+
+train_module.add_argument("--device",default=None,help="the physical device to train the model\n"
+                                                        "optional: cpu, cuda or other else supported in pytorch\n"
+                                                        "default=None, which means it will use the cuda firstly if with Nvidia GPU, and if not, the cpu will be used")
+train_module.add_argument("--random_state",type=int,default=0,help="the random state to randomly split raw datasets\n"
+                                                            "default=0")
+train_module.add_argument("--rerun",action="store_true",default=False,help="whether to rerun and if not, it would load the latest parameters in previous results")
+
+train_module.add_argument("--save_param_dir",default="cache",help="whether to save parameters and if so, the corresponding saved directory")
+train_module.add_argument("--save_param_prefix",default="weights",help="whether to save parameters and if so, the corresponding saved file prefix")
+train_module.add_argument("--log_dir",default="log",help="the logger directory")
+
+train_module.add_argument("--save_model",help="whether to save model and if so, rhe corresponding save path")
+train_module.add_argument("--verbose",action="store_true", default=False, help="whether to open the verbose mode")
+
+# preprocess_module.add_argument("-s","--step",dest="step",default=None, help="choose specific step to run\n"
+#                                            "    generate_interactions: generate valid interactions within compartment A/B\n"
+#                                            "    filtration: filt the valid interactions based on user specified parameters\n"
+#                                            "    balance: \n"
+#                                            "    extract_seqs\n")
 # dataset_name,
 # concat_reverse, encode_method
 # chrom_size_file,valid_pairs_file,eigenvec_dir,eigenvec_file_pattern,bin_size,keep_chrom_file=None,discard_chrom_file
@@ -186,46 +313,53 @@ def main():
     ### Global configs
 
     ### Preprocess
-    temp_dir = arg.temp_dir
-    output = arg.output
-    chunksize = arg.chunksize
-    ## generate_compartments
-    step, hic_file, juicer_tools_path, threads, chrom_size_file = \
-        arg.step, arg.hic_file, arg.juicer_tools_path, arg.threads, arg.chrom_size_file
-    method, flag, bin_size, output_dir, output_prefix, verbose = \
-        arg.method, arg.flag, arg.bin_size, arg.output_dir, arg.output_prefix, arg.verbose
+    if module == "Preprocess":
+        temp_dir = arg.temp_dir
+        output = arg.output
+        chunksize = arg.chunksize
+        ## generate_compartments
+        step, hic_file, juicer_tools_path, threads, chrom_size_file = \
+            arg.step, arg.hic_file, arg.juicer_tools_path, arg.threads, arg.chrom_size_file
+        method, flag, bin_size, output_dir, output_prefix, verbose = \
+            arg.method, arg.flag, arg.bin_size, arg.output_dir, arg.output_prefix, arg.verbose
 
-    ##
-    chrom_size_file, valid_pairs_file, eigenvec_dir, eigenvec_file_pattern, keep_chrom_file, discard_chrom_file = \
-        arg.chrom_size_file,arg.input,arg.eigenvec_dir,arg.eigenvec_file_pattern,arg.keep_chrom_file,arg.discard_chrom_file
-    if output_dir is None:
-        output_dir = os.path.dirname(output)
-    check_and_create_dir(output_dir)
-    progress_file = os.path.join(output_dir, "progress.pkl")
+        ##
+        chrom_size_file, valid_pairs_file, eigenvec_dir, eigenvec_file_pattern, keep_chrom_file, discard_chrom_file = \
+            arg.chrom_size_file,arg.input,arg.eigenvec_dir,arg.eigenvec_file_pattern,arg.keep_chrom_file,arg.discard_chrom_file
+        if output_dir is None:
+            output_dir = os.path.dirname(output)
+        check_and_create_dir(output_dir)
+        progress_file = os.path.join(output_dir, "progress.pkl")
 
-    ## Filtration
-    input_interaction = arg.input
-    interact_type, promoter, distance, within_compartment, annotation = arg.interact_type,arg.promoter,arg.distance,arg.within_compartment,arg.annotation
-    promoter_range = arg.promoter_range
-    distance_type = arg.distance_type
-    promoter_number = arg.promoter_number
-    length = arg.length
-    output_raw = arg.output_raw
+        ## Filtration
+        input_interaction = arg.input
+        interact_type, promoter, distance, within_compartment, annotation = arg.interact_type,arg.promoter,arg.distance,arg.within_compartment,arg.annotation
+        promoter_range = arg.promoter_range
+        distance_type = arg.distance_type
+        promoter_number = arg.promoter_number
+        length = arg.length
+        output_raw = arg.output_raw
 
-    ##
-    filter_interactions_file, raw_interactions_file, reference_genome, GC_content = arg.input, arg.raw_interactions_file,arg.reference_genome, arg.GC_content
-    balanced_interaction_type, balanced_same_chromsome = arg.balanced_interaction_type,arg.balanced_same_chromsome
+        ##
+        filter_interactions_file, raw_interactions_file, reference_genome, GC_content = arg.input, arg.raw_interactions_file,arg.reference_genome, arg.GC_content
+        balanced_interaction_type, balanced_same_chromsome = arg.balanced_interaction_type,arg.balanced_same_chromsome
 
-    ##
-    raw_interaction_fasta_file = arg.raw_interaction_fasta_file
-    concat_reverse, encode_method = arg.encode_method, arg.encode_method
-    balanced_interaction_file = arg.input
-    dataset_name = arg.dataset_name
-    equal_length = arg.equal_length
-    concat_epi = arg.concat_epi
-    trim, padding = arg.trim, arg.padding
-    compression = arg.compression
-    pretrained_vec_file, k_mer = arg.pretrained_vec_file, arg.k_mer
+        ##
+        raw_interaction_fasta_file = arg.raw_interaction_fasta_file
+        concat_reverse, encode_method = arg.concat_reverse, arg.encode_method
+        balanced_interaction_file = arg.input
+        dataset_name = arg.dataset_name
+        # equal_length = arg.equal_length
+        promoter_length = arg.promoter_length
+        enhancer_length = arg.enhancer_length
+        concat_epi = arg.concat_epi
+        trim, padding = arg.trim, arg.padding
+        compression = arg.compression
+        pretrained_vec_file, k_mer = arg.pretrained_vec_file, arg.k_mer
+
+    ### Datasets module
+
+    # print(split)
     if module == "Preprocess":
         progress_key = ["generate_compartments","generate_interactions","filtration","balance","extract_dataset"]
         fprint_step(module)
@@ -301,7 +435,7 @@ def main():
             if not progress_tracker.get_progress(progress_key[4]):
                 fprint_step(step="extract_dataset")
                 extract_datasets = extract_seqs.ExtractDatasets(balanced_interaction_file, raw_interaction_fasta_file,dataset_name,
-                                                                concat_reverse,equal_length,trim, padding,compression,concat_epi,
+                                                                concat_reverse,enhancer_length,promoter_length,trim, padding,compression,concat_epi,
                                                                 pretrained_vec_file, k_mer,
                                                                 encode_method, temp_dir, output_dir, output, threads,
                                                                 chunksize, verbose)
@@ -345,15 +479,84 @@ def main():
         elif step == "extract_dataset":
             fprint_step(step="extract_dataset")
             extract_datasets = extract_seqs.ExtractDatasets(balanced_interaction_file, raw_interaction_fasta_file, dataset_name, concat_reverse,
-                                                            equal_length, trim, padding,compression,concat_epi,pretrained_vec_file,k_mer,
+                                                            enhancer_length,promoter_length, trim, padding,compression,concat_epi,pretrained_vec_file,k_mer,
                                                             encode_method,temp_dir, output_dir, output, threads, chunksize, verbose)
 
             extract_datasets.run()
         else:
             fprint("Error","Wrong step specified!")
 
-    ## generate_interactions
+    elif module == "Datasets":
+        # split = arg.split
+        input_file = arg.input
+        key = arg.key
+        chunk_size = arg.chunksize
+        test_size = arg.test_size
+        output_format = arg.output_format
+        random_state = arg.random_state
+        split = arg.split
+        output_prefix = arg.output_prefix
+        compression = arg.compression
 
+        verbose = arg.verbose
+
+        prep_datasets = PrepDatasets(input_file, key, test_size, split, chunk_size, output_format, output_prefix, compression,
+                                     random_state, verbose)
+        prep_datasets.run()
+        # try:
+        #     prep_datasets = PrepDatasets(input_file,key,test_size,split,output_format,output_prefix,compression,random_state,verbose)
+        #     prep_datasets.run()
+        # except Exception as e:
+        #     print(e)
+        #     sys.exit(-1)
+        #     pass
+
+        pass
+
+    elif module == "Train":
+        train_dataset_file = arg.input
+        test_dataset_file = arg.test_input
+        train_dataset_dir,train_dataset_pattern,model,is_param_optim = \
+            arg.train_dataset_dir,arg.train_dataset_pattern,arg.model,arg.is_param_optim
+        workers = arg.workers
+        encode_method, concat_reverse = arg.encode_method,arg.concat_reverse
+        param_optim_strategy,k_fold,epochs, lr, optimizer, batch_size,  momentum = \
+            arg.param_optim_strategy,arg.k_fold,arg.epochs, arg.lr, arg.optimizer, arg.batch_size,  arg.momentum
+        init = arg.init
+        device, random_state, save_param_dir, save_model = arg.device, arg.random_state, arg.save_param_dir, arg.save_model
+        params_config = arg.params_config
+        random_size = arg.random_size
+        init_points, n_iter = arg.init_points,arg.n_iter
+        ##
+        weight_decay, nesterov, betas, eps, lr_decay, initial_accumulator_value, rho, alpha, \
+                         lambd, t0, max_iter, max_eval = arg.weight_decay, arg.nesterov, arg.betas, arg.eps, arg.lr_decay, arg.initial_accumulator_value, arg.rho, arg.alpha, \
+                         arg.lambd, arg.t0, arg.max_iter, arg.max_eval
+        save_param_prefix = arg.save_param_prefix
+        rerun = arg.rerun
+        save_fig = arg.save_fig
+        metrics = arg.metrics
+        log_dir = arg.log_dir
+        verbose = arg.verbose
+
+        train_model = TrainModel(train_dataset_dir, train_dataset_pattern, train_dataset_file,test_dataset_file,workers,
+                                 model, encode_method, concat_reverse,
+                                 is_param_optim,
+                                 param_optim_strategy, params_config,random_size,init_points, n_iter,
+                                 k_fold,metrics,save_fig,init,
+                                 epochs, lr, optimizer, batch_size, momentum,
+                                 weight_decay, nesterov, betas, eps, lr_decay, initial_accumulator_value, rho, alpha, \
+                                 lambd, t0, max_iter, max_eval,
+                                 device, random_state,
+                                 rerun, save_param_dir, save_param_prefix,log_dir, save_model, verbose)
+        train_model.run()
+        # try:
+        #     train_model = TrainModel(train_dataset_dir, train_dataset_pattern, train_dataset_file, model, is_param_optim, param_optim_strategy, k_fold,
+        #          epochs, lr, optimizer, batch_size,momentum,device,random_state,
+        #          save_param, save_model, verbose)
+        #     train_model.run()
+        # except Exception as e:
+        #     print(e)
+        #     sys.exit(-1)
     pass
 
 

@@ -10,9 +10,11 @@ import dna2vec.multi_k_model
 from modules.utils import *
 
 class DNA2VecEncoder:
-    def __init__(self, pretrained_vec_file, k, threads):
+    def __init__(self, pretrained_vec_file, k, threads, max_len=2000,pad_idx=0):
         self.pretrained_vec_model = dna2vec.multi_k_model.MultiKModel(pretrained_vec_file)
         self.k = k
+        self.max_len = max_len
+        self.pad_idx = pad_idx
         self.threads = threads
         self.k_mers = []
         pass
@@ -27,11 +29,20 @@ class DNA2VecEncoder:
             self.k_mers += self.generate_k_mers(seq, self.k)
         pass
 
-    def transform(self):
+    def transform(self, max_len):
         with futures.ThreadPoolExecutor(self.threads) as executor:  # 实例化线程池
             res = executor.map(self.get_vector_each, self.k_mers)
-        return np.vstack(list(res))
+        res_array = np.vstack(list(res))
 
+        return self.preprocess(res_array,max_len)
+
+        # pass
+    def preprocess(self,raw_array,max_len):
+        if raw_array.shape[0] < max_len:
+            pad_length = max_len - raw_array.shape[0]
+            return np.r_[raw_array,np.full((pad_length,self.pretrained_vec_model.vec_dim),fill_value=self.pad_idx)]
+        else:
+            return raw_array[range(max_len)]
         pass
 
     def generate_k_mers(self, sequence, k):

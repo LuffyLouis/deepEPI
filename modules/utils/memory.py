@@ -35,3 +35,12 @@ class MemoryUseReporter:
         for child in children:
             self.total_memory_usage += get_memory_usage(child)
         return convert_bytes_to_human_readable(self.total_memory_usage)
+
+    def get_memory_byte(self):
+        total_memory_usage = 0
+        total_memory_usage += get_memory_usage(self.current_process)
+        # 获取当前进程的所有子进程
+        children = self.current_process.children(recursive=True)
+        for child in children:
+            total_memory_usage += get_memory_usage(child)
+        return total_memory_usage

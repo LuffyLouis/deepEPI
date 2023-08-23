@@ -12,10 +12,15 @@
 .git
 .idea
 .ipynb_checkpoints
+.virtual_documents
 .token
+.external
 # temporary or data files
 __pycache__
 sample/
 input/
 temp/
 output/
+cache/
+log/
+figs/

@@ -223,6 +223,7 @@
 <li class="toctree-l4"><a class="reference internal" href="modules.utils.html#modules.utils.encode.DNA2VecEncoder.fit"><code class="docutils literal notranslate"><span class="pre">DNA2VecEncoder.fit()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="modules.utils.html#modules.utils.encode.DNA2VecEncoder.generate_k_mers"><code class="docutils literal notranslate"><span class="pre">DNA2VecEncoder.generate_k_mers()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="modules.utils.html#modules.utils.encode.DNA2VecEncoder.get_vector_each"><code class="docutils literal notranslate"><span class="pre">DNA2VecEncoder.get_vector_each()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="modules.utils.html#modules.utils.encode.DNA2VecEncoder.preprocess"><code class="docutils literal notranslate"><span class="pre">DNA2VecEncoder.preprocess()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="modules.utils.html#modules.utils.encode.DNA2VecEncoder.transform"><code class="docutils literal notranslate"><span class="pre">DNA2VecEncoder.transform()</span></code></a></li>
 </ul>
 </li>
@@ -231,6 +232,7 @@
 <li class="toctree-l2"><a class="reference internal" href="modules.utils.html#module-modules.utils.memory">modules.utils.memory module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="modules.utils.html#modules.utils.memory.MemoryUseReporter"><code class="docutils literal notranslate"><span class="pre">MemoryUseReporter</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="modules.utils.html#modules.utils.memory.MemoryUseReporter.get_memory"><code class="docutils literal notranslate"><span class="pre">MemoryUseReporter.get_memory()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="modules.utils.html#modules.utils.memory.MemoryUseReporter.get_memory_byte"><code class="docutils literal notranslate"><span class="pre">MemoryUseReporter.get_memory_byte()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="modules.utils.html#modules.utils.memory.convert_bytes_to_human_readable"><code class="docutils literal notranslate"><span class="pre">convert_bytes_to_human_readable()</span></code></a></li>
@@ -249,6 +251,9 @@
 <li class="toctree-l2"><a class="reference internal" href="modules.utils.html#module-modules.utils.timer">modules.utils.timer module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="modules.utils.html#modules.utils.timer.Timer"><code class="docutils literal notranslate"><span class="pre">Timer</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="modules.utils.html#modules.utils.timer.Timer.elapsed_time"><code class="docutils literal notranslate"><span class="pre">Timer.elapsed_time()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="modules.utils.html#modules.utils.timer.Timer.final_elapsed_time"><code class="docutils literal notranslate"><span class="pre">Timer.final_elapsed_time()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="modules.utils.html#modules.utils.timer.Timer.final_start"><code class="docutils literal notranslate"><span class="pre">Timer.final_start()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="modules.utils.html#modules.utils.timer.Timer.final_stop"><code class="docutils literal notranslate"><span class="pre">Timer.final_stop()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="modules.utils.html#modules.utils.timer.Timer.start"><code class="docutils literal notranslate"><span class="pre">Timer.start()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="modules.utils.html#modules.utils.timer.Timer.stop"><code class="docutils literal notranslate"><span class="pre">Timer.stop()</span></code></a></li>
 </ul>
@@ -262,15 +267,18 @@
 <li class="toctree-l3"><a class="reference internal" href="modules.utils.html#modules.utils.tools.check_gff_db"><code class="docutils literal notranslate"><span class="pre">check_gff_db()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="modules.utils.html#modules.utils.tools.create_gff_db"><code class="docutils literal notranslate"><span class="pre">create_gff_db()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="modules.utils.html#modules.utils.tools.filt_chrom"><code class="docutils literal notranslate"><span class="pre">filt_chrom()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules.utils.html#modules.utils.tools.format_dict_to_filename"><code class="docutils literal notranslate"><span class="pre">format_dict_to_filename()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="modules.utils.html#modules.utils.tools.format_location"><code class="docutils literal notranslate"><span class="pre">format_location()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="modules.utils.html#modules.utils.tools.fprint"><code class="docutils literal notranslate"><span class="pre">fprint()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="modules.utils.html#modules.utils.tools.fprint_step"><code class="docutils literal notranslate"><span class="pre">fprint_step()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="modules.utils.html#modules.utils.tools.get_intersection"><code class="docutils literal notranslate"><span class="pre">get_intersection()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="modules.utils.html#modules.utils.tools.human_read_length"><code class="docutils literal notranslate"><span class="pre">human_read_length()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="modules.utils.html#modules.utils.tools.initialize_all_tasks"><code class="docutils literal notranslate"><span class="pre">initialize_all_tasks()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules.utils.html#modules.utils.tools.isNumber"><code class="docutils literal notranslate"><span class="pre">isNumber()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="modules.utils.html#modules.utils.tools.listen_batch"><code class="docutils literal notranslate"><span class="pre">listen_batch()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="modules.utils.html#modules.utils.tools.mean"><code class="docutils literal notranslate"><span class="pre">mean()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="modules.utils.html#modules.utils.tools.read_chrom_size"><code class="docutils literal notranslate"><span class="pre">read_chrom_size()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules.utils.html#modules.utils.tools.read_config_file"><code class="docutils literal notranslate"><span class="pre">read_config_file()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="modules.utils.html#modules.utils.tools.read_gff"><code class="docutils literal notranslate"><span class="pre">read_gff()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="modules.utils.html#modules.utils.tools.read_list_file"><code class="docutils literal notranslate"><span class="pre">read_list_file()</span></code></a></li>
 </ul>
