@@ -82,25 +82,25 @@ def train_each(epoch, log_writer, log_mode, model, data_loader,test_loader, opti
                     # print("output: {}".format(output))
                     test_loss += criterion(output, label).item()
                     pred = output.argmax(axis=1, keepdim=True)
-                    correct += pred.eq(label.view_as(pred)).sum().item()
+                    correct += pred.equal(label.reshape(pred.shape)).sum().item()
                     # print("index:{}".format(index))
                     # print("correct:{}".format(correct))
 
                 test_loss /= label.numel()
                 test_accuracy = correct / label.numel()
             if verbose:
-                print("Epoch: {}, batch: {}, loss: {:4f}, train acc: {:2f}, test acc: {:2f}".format(epoch, batch,loss.data,train_acc,test_accuracy))
+                print("Epoch: {}, batch: {}, loss: {:4f}, train acc: {:2f}, test acc: {:2f}".format(epoch, batch,loss.numpy(),train_acc,test_accuracy))
         else:
             if verbose:
-                print("Epoch: {}, batch: {}, loss: {:4f}, train acc: {:2f}".format(epoch, batch,loss.data,train_acc))
+                print("Epoch: {}, batch: {}, loss: {:4f}, train acc: {:2f}".format(epoch, batch,loss.numpy(),train_acc))
         loss.backward()
         optimizer.step()
     if log_writer:
         if log_mode.lower() == "train":
-            log_writer.add_scalar("train loss", loss.data, epoch)
-            log_writer.add_scalar("train accuracy", train_acc, epoch)
+            log_writer.add_scalar("train loss", loss.numpy(), epoch)
+            log_writer.add_scalar("train accuracy", train_acc.numpy(), epoch)
             if test_loader:
-                log_writer.add_scalar("test accuracy", test_accuracy, epoch)
+                log_writer.add_scalar("test accuracy", test_accuracy.numpy(), epoch)
         else:
             pass
         # log_writer.add
@@ -409,7 +409,7 @@ class TrainModel:
             # print("loading_res: {}".format(loading_res))
             if loading_res:
                 fprint(msg="Loading the latest weights from {} directory based on {} prefix...".format(self.save_param_dir, self.save_param_prefix))
-                self.training_model.set_state_dict(loading_res, strict=False)
+                self.training_model.set_state_dict(loading_res)
             else:
                 pass
         else:
