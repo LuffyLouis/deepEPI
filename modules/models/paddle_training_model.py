@@ -5,7 +5,7 @@ import re
 
 import numpy as np
 import paddle
-from matplotlib import pyplot as plt
+# from matplotlib import pyplot as plt
 from sklearn.model_selection import KFold
 from sklearn.metrics import roc_curve, precision_recall_curve, auc, f1_score
 # from scipy import interp
@@ -15,7 +15,7 @@ from bayes_opt import BayesianOptimization
 from paddle.io import Dataset, DataLoader
 from paddle import nn
 from tensorboardX import SummaryWriter
-from d2l import torch as d2l
+# from d2l import torch as d2l
 from modules import fprint, check_and_create_dir, format_dict_to_filename, read_config_file, Timer
 from modules.datasets.paddle_datasets import EPIDatasets
 from modules.evaluation.evaluation import ModelEvaluator
