@@ -81,7 +81,7 @@ def train_each(epoch, log_writer, log_mode, model, data_loader,test_loader, opti
                     output = model(data)
                     # print("output: {}".format(output))
                     test_loss += criterion(output, label).item()
-                    pred = output.argmax(dim=1, keepdim=True)
+                    pred = output.argmax(axis=1, keepdim=True)
                     correct += pred.eq(label.view_as(pred)).sum().item()
                     # print("index:{}".format(index))
                     # print("correct:{}".format(correct))
@@ -409,7 +409,7 @@ class TrainModel:
             # print("loading_res: {}".format(loading_res))
             if loading_res:
                 fprint(msg="Loading the latest weights from {} directory based on {} prefix...".format(self.save_param_dir, self.save_param_prefix))
-                self.training_model.load_state_dict(loading_res, strict=False)
+                self.training_model.set_state_dict(loading_res, strict=False)
             else:
                 pass
         else:
