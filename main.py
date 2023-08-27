@@ -210,9 +210,17 @@ train_module.add_argument("--model",help="the model selected to train\n"
                                          "optional: \n"
                                          "  simpleCNN\n"
                                          "  CNN\n"
-                                         "  EPI-Mind")
+                                         "  EPIMind")
 train_module.add_argument("--encode_method",default="onehot",help="the RegExp pattern of input .h5 files")
 train_module.add_argument("--concat_reverse",action="store_true",default=False,help="the RegExp pattern of input .h5 files")
+#
+train_module.add_argument("--enhancer_len",type=float,default=4e3,help="the max length of enhancer")
+train_module.add_argument("--promoter_len",type=float,default=2e3,help="the max length of promoter")
+train_module.add_argument("--heads",type=int,default=8,help="the number of heads in multi-head attention")
+train_module.add_argument("--num_layers",type=int,default=4,help="the number of stacks of encoder")
+train_module.add_argument("--num_hiddens",type=int,default=72,help="the number of elements in hidden layer")
+train_module.add_argument("--ffn_num_hiddens",type=int,default=256,help="the number of elements in hidden layer in Feed forward hidden layer")
+# enhancer_len, promoter_len, heads, num_layers, num_hiddens, ffn_num_hiddens
 # encode_method,concat_reverse
 train_module.add_argument("--is_param_optim",action="store_true",default=False,help="whether to optimize the hyper-parameters")
 train_module.add_argument("--param_optim_strategy",help="the strategy for hyper-parameters optimization\n"
@@ -519,6 +527,10 @@ def main():
         train_dataset_dir,train_dataset_pattern,model,is_param_optim = \
             arg.train_dataset_dir,arg.train_dataset_pattern,arg.model,arg.is_param_optim
         workers = arg.workers
+
+        enhancer_len, promoter_len, heads, num_layers, num_hiddens, ffn_num_hiddens = \
+            arg.enhancer_len,arg.promoter_len,arg.heads,arg.num_layers,arg.num_hiddens,arg.ffn_num_hiddens
+
         encode_method, concat_reverse = arg.encode_method,arg.concat_reverse
         param_optim_strategy,k_fold,epochs, lr, optimizer, batch_size,  momentum = \
             arg.param_optim_strategy,arg.k_fold,arg.epochs, arg.lr, arg.optimizer, arg.batch_size,  arg.momentum
@@ -540,6 +552,7 @@ def main():
 
         train_model = TrainModel(train_dataset_dir, train_dataset_pattern, train_dataset_file,test_dataset_file,workers,
                                  model, encode_method, concat_reverse,
+                                 enhancer_len, promoter_len, heads, num_layers, num_hiddens, ffn_num_hiddens,
                                  is_param_optim,
                                  param_optim_strategy, params_config,random_size,init_points, n_iter,
                                  k_fold,metrics,save_fig,init,
