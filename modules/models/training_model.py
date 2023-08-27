@@ -270,7 +270,7 @@ def find_lateset_weight(saved_weights_dir):
     file_time_list = []
     for idx, file in enumerate(files):
         if 'weights' in file:
-            file_time = datetime.strptime(file.split("_")[1],"%Y%m%d-%H%M%S")
+            file_time = datetime.strptime(file.split("_")[-1],"%Y%m%d-%H%M%S")
             file_time_list.append(file_time)
     if len(file_time_list) > 0:
         latest_time = max(file_time_list)

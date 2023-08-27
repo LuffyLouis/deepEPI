@@ -248,14 +248,14 @@ class EPIMind(nn.Module):
         self.kqv_size = num_hiddens
         self.transformer_encoder_enhancer = TransformerEncoder(max_len=self.enhancer_len,key_size=self.kqv_size, query_size=self.kqv_size,
                                                                value_size=self.kqv_size,
-                                                               num_hiddens=num_hiddens, norm_shape=[198, num_hiddens],
+                                                               d_model=num_hiddens, norm_shape=[198, num_hiddens],
                                                                ffn_num_input=num_hiddens,
                                                                ffn_num_hiddens=ffn_num_hiddens,
                                                                num_heads=num_heads, num_layers=num_layers, dropout=0.1,
                                                                use_bias=False)
         self.transformer_encoder_promoter = TransformerEncoder(max_len=self.promoter_len,key_size=self.kqv_size, query_size=self.kqv_size,
                                                                value_size=self.kqv_size,
-                                                               num_hiddens=num_hiddens, norm_shape=[98, num_hiddens],
+                                                               d_model=num_hiddens, norm_shape=[98, num_hiddens],
                                                                ffn_num_input=num_hiddens,
                                                                ffn_num_hiddens=ffn_num_hiddens,
                                                                num_heads=num_heads, num_layers=num_layers, dropout=0.1,

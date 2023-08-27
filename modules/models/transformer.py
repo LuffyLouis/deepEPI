@@ -118,6 +118,8 @@ class MultiHeadAttention(nn.Module):
         super(MultiHeadAttention, self).__init__(**kwargs)
         self.num_heads = num_heads
         self.attention = DotProductAttention(dropout)
+        self.head_dim = num_hiddens // num_heads
+        assert self.head_dim * self.num_heads == num_hiddens, "embed_dim must be divisible by num_heads"
         self.W_q = nn.Linear(query_size, num_hiddens, bias=bias)
         self.W_k = nn.Linear(key_size, num_hiddens, bias=bias)
         self.W_v = nn.Linear(value_size, num_hiddens, bias=bias)
@@ -155,16 +157,16 @@ class MultiHeadAttention(nn.Module):
 
 class EncoderBlock(nn.Module):
     """Transformer编码器块"""
-    def __init__(self, key_size, query_size, value_size, num_hiddens,
+    def __init__(self, key_size, query_size, value_size, d_model,
                  norm_shape, ffn_num_input, ffn_num_hiddens, num_heads,
                  dropout, use_bias=False, **kwargs):
         super(EncoderBlock, self).__init__(**kwargs)
         self.attention = MultiHeadAttention(
-            key_size, query_size, value_size, num_hiddens, num_heads, dropout,
+            key_size, query_size, value_size, d_model, num_heads, dropout,
             use_bias)
         self.addnorm1 = AddNorm(norm_shape, dropout)
         self.ffn = PositionWiseFFN(
-            ffn_num_input, ffn_num_hiddens, num_hiddens)
+            ffn_num_input, ffn_num_hiddens, d_model)
         self.addnorm2 = AddNorm(norm_shape, dropout)
 
     def forward(self, X, valid_lens):
@@ -208,20 +210,22 @@ class Encoder(nn.Module):
 class TransformerEncoder(Encoder):
     # nn.Layer
     """Transformer编码器"""
-    def __init__(self, max_len, key_size=8, query_size=8, value_size=8,
-                 num_hiddens=64, norm_shape=-1, ffn_num_input=64, ffn_num_hiddens=128,
+    # nn.Transformer
+    def __init__(self, max_len, key_size=64, query_size=64, value_size=64,
+                 d_model=64, norm_shape=-1, ffn_num_input=64, ffn_num_hiddens=128,
                  num_heads=8, num_layers=3, dropout=0.1, use_bias=False, **kwargs):
         super(TransformerEncoder, self).__init__(**kwargs)
-        self.num_hiddens = num_hiddens
+        self.d_model = d_model
         ## remove the embedding layer due to the rough feature extraction layer
         # self.embedding = inputs
         # self.conv_layer =
         # self.embedding.weigh
-        self.pos_encoding = PositionalEncoding(num_hiddens, dropout, max_len=max_len)
+        # self.sd = nn.Embedding()
+        self.pos_encoding = PositionalEncoding(d_model, dropout, max_len=max_len)
         self.blks = nn.Sequential()
         for i in range(num_layers):
             self.blks.add_module("block"+str(i),
-                EncoderBlock(key_size, query_size, value_size, num_hiddens,
+                EncoderBlock(key_size, query_size, value_size, d_model,
                              norm_shape, ffn_num_input, ffn_num_hiddens,
                              num_heads, dropout, use_bias))
 
@@ -229,7 +233,7 @@ class TransformerEncoder(Encoder):
         # 因为位置编码值在-1和1之间，
         # 因此嵌入值乘以嵌入维度的平方根进行缩放，
         # 然后再与位置编码相加。
-        X = self.pos_encoding(X * math.sqrt(self.num_hiddens))
+        X = self.pos_encoding(X * math.sqrt(self.d_model))
         self.attention_weights = [None] * len(self.blks)
         for i, blk in enumerate(self.blks):
             X = blk(X, valid_lens)
