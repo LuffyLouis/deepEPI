@@ -3,7 +3,6 @@ import os
 import h5py
 import numpy as np
 import torch
-# from torchvision import datasets
 
 from modules import fprint
 from sklearn.model_selection import train_test_split

@@ -171,11 +171,17 @@ echo $i
 python main.py Train \
 --input output/prep_datasets_dna2vec_train.h5 --test_input output/prep_datasets_dna2vec_test.h5 \
 --model simpleCNN --encode_method dna2vec \
---device cuda --epochs 10 --batch_size 32 \
+--device gpu --epochs 10 --batch_size 32 \
 --optimizer Adam --workers 2 \
 --k_fold 10 --is_param_optim --param_optim_strategy grid --rerun --save_fig ROC_10fold_dna2vec_Adam_${i}
 done
-
+##
+python main.py Train \
+--input output/prep_datasets_dna2vec_4kb_2kb_train.h5 --test_input output/prep_datasets_dna2vec_4kb_2kb_test.h5 \
+--model simpleCNN --encode_method dna2vec \
+--device cuda --epochs 10 --batch_size 32 \
+--optimizer Adam --workers 2 \
+--k_fold 10 --rerun --save_fig ROC_10fold_dna2vec_SGD_bayes 
 #### Training model with simpleCNN + dna2vec + Adam + bayes
 for ((i=1;i<4;i++))
 do
@@ -188,8 +194,50 @@ python main.py Train \
 --params_config config_bayes.txt \
 --k_fold 10 --is_param_optim --param_optim_strategy bayes --rerun --save_fig ROC_10fold_dna2vec_Adam_bayes_${i} >log/log_dna2vec_Adam_bayes_${i}.log
 done
+#### Training model with simpleCNN + dna2vec + SGD + bayes
+for ((i=1;i<4;i++))
+do
+echo $i
+python main.py Train \
+--input output/prep_datasets_dna2vec_4kb_2kb_train.h5 --test_input output/prep_datasets_dna2vec_4kb_2kb_test.h5 \
+--model simpleCNN --encode_method dna2vec \
+--device cuda --epochs 10 --batch_size 32 \
+--optimizer SGD --workers 2 \
+--params_config config_bayes.txt \
+--k_fold 10 --is_param_optim --param_optim_strategy bayes --rerun --save_fig ROC_10fold_dna2vec_SGD_bayes_${i}  >log/log_dna2vec_SGD_bayes_${i}.log
+done
 
-## 
+## Training model with EPI-Mind + dna2vec 
+python main.py Train \
+--input output/prep_datasets_dna2vec_4kb_2kb_train.h5 --test_input output/prep_datasets_dna2vec_4kb_2kb_test.h5 \
+--model EPIMind --encode_method dna2vec \
+--optimizer Adam \
+--workers 2 \
+--heads 8 --num_layers 4 --num_hiddens 72 --ffn_num_hiddens 256 \
+--device cuda --epochs 10 --batch_size 64 --rerun
+
+python main.py Train \
+--input output/prep_datasets_dna2vec_4kb_2kb_train.h5 --test_input output/prep_datasets_dna2vec_4kb_2kb_test.h5 \
+--model EPIMind --encode_method dna2vec \
+--optimizer Adam \
+--workers 2 \
+--heads 8 --num_layers 4 --num_hiddens 72 --ffn_num_hiddens 256 \
+--device gpu --epochs 10 --batch_size 64 --rerun --verbose
+
+##
+for ((i=1;i<4;i++))
+do
+echo $i
+python main.py Train \
+--input output/prep_datasets_dna2vec_4kb_2kb_train.h5 --test_input output/prep_datasets_dna2vec_4kb_2kb_test.h5 \
+--model EPIMind --encode_method dna2vec \
+--optimizer Adam --k_fold 10 --is_param_optim --param_optim_strategy bayes \
+--workers 2 \
+--params_config config_bayes.txt \
+--heads 8 --num_layers 4 --num_hiddens 72 --ffn_num_hiddens 256 \
+--device cuda --epochs 10 --batch_size 64 --rerun --verbose --save_fig ROC_10fold_EPIMind_dna2vec_SGD_bayes_${i} >log/log_EPIMind_dna2vec_SGD_bayes_${i}.log
+done
+
 ################################
 ## Preprocess
 java -jar /home/hfliu/liuhongfei/software/juicer_tools_1.22.01.jar eigenvector \

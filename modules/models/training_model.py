@@ -8,18 +8,18 @@ import torch
 from matplotlib import pyplot as plt
 from sklearn.model_selection import KFold
 from sklearn.metrics import roc_curve, precision_recall_curve, auc, f1_score
-from scipy import interp
-from sklearn.model_selection import GridSearchCV
-from skorch import NeuralNetClassifier
+# from scipy import interp
+# from sklearn.model_selection import GridSearchCV
+# from skorch import NeuralNetClassifier
 from bayes_opt import BayesianOptimization
 from torch.utils.data import Dataset, DataLoader
 from torch import nn
 from tensorboardX import SummaryWriter
-from d2l import torch as d2l
+# from d2l import torch as d2l
 from modules import fprint, check_and_create_dir, format_dict_to_filename, read_config_file, Timer
 from modules.datasets.datasets import EPIDatasets
 from modules.evaluation.evaluation import ModelEvaluator
-from modules.models.models import SimpleCNN, init_weights
+from modules.models.models import SimpleCNN, init_weights, EPIMind
 #
 # torch.backends.cudnn.enabled = False
 #
@@ -27,6 +27,7 @@ from modules.models.models import SimpleCNN, init_weights
 # torch.backends.cudnn.benchmark = False
 # torch.backends.cudnn.deterministic = False
 # torch.backends.cudnn.allow_tf32 = True
+from modules.models.tools import accuracy
 
 
 def train_each(epoch, log_writer, log_mode, model, data_loader,test_loader, optimizer, device,verbose):
@@ -59,7 +60,7 @@ def train_each(epoch, log_writer, log_mode, model, data_loader,test_loader, opti
         output = model(data)
         # print("output: {}".format(output.shape))
         loss = criterion(output, label)
-        train_acc = d2l.accuracy(output, label) / label.numel()
+        train_acc = accuracy(output, label) / label.numel()
         # model.eval()
         test_loss = 0
         correct = 0
@@ -107,7 +108,9 @@ def train_each(epoch, log_writer, log_mode, model, data_loader,test_loader, opti
 
 
 def kfold_cross_validation(encode_method, concat_reverse,workers,timer,
-                           kfold,  log_writer, epoches, batch_size, model, init_method, optimizer,raw_dataset, metrics,save_path, device,verbose):
+                           kfold,  log_writer, epoches, batch_size, model, init_method, optimizer,raw_dataset, metrics,save_path,
+                            enhancer_len,promoter_len,heads,num_layers,num_hiddens,ffn_num_hiddens,
+                           device,verbose):
     # optimizer = torch.optim.SGD(model.parameters(),lr=0.1,momentum=0.9)
     # model.train()
     criterion = nn.CrossEntropyLoss()
@@ -123,8 +126,11 @@ def kfold_cross_validation(encode_method, concat_reverse,workers,timer,
     for fold, (train_ids, val_ids) in enumerate(kfold.split(raw_dataset)):
         print(f"Fold {fold + 1}")
         if model == "simpleCNN":
-            training_model = SimpleCNN(encode_method=encode_method,concat_reverse=concat_reverse,init_method=init_method)
-
+            training_model = SimpleCNN(encode_method=encode_method,concat_reverse=concat_reverse,init_method=init_method,verbose=verbose)
+        elif model == "EPIMind":
+            training_model = EPIMind(concat_reverse=concat_reverse,init_method=init_method,
+                                     enhancer_len=enhancer_len, promoter_len=promoter_len,
+                                     num_heads=heads, num_layers=num_layers, num_hiddens=num_hiddens, ffn_num_hiddens=ffn_num_hiddens,verbose=verbose)
         training_model.to(device)
         # print("{}, {}".format(len(train_ids),len(val_ids)))
         # 获取当前折的训练数据和验证数据
@@ -331,6 +337,7 @@ def generate_param_combinations(hyperparameters):
 class TrainModel:
     def __init__(self, train_dataset_dir, train_dataset_pattern, train_dataset_file,test_dataset_file,workers,
                  model, encode_method,concat_reverse,
+                 enhancer_len,promoter_len,heads,num_layers,num_hiddens,ffn_num_hiddens,
                  is_param_optim, param_optim_strategy,params_config,random_size,
                  init_points,n_iter,
                  k_fold,metrics,save_path,
@@ -356,6 +363,14 @@ class TrainModel:
         self.init_method = init_method
         self.training_model = None
         self.train_dataset_files = []
+
+        ##
+        self.enhancer_len = enhancer_len
+        self.promoter_len = promoter_len
+        self.num_heads = heads
+        self.num_layers = num_layers
+        self.num_hiddens = num_hiddens
+        self.ffn_num_hiddens = ffn_num_hiddens
         ##
         self.epochs, self.lr, self.optimizer, self.batch_size = epochs,lr,optimizer,batch_size
 
@@ -394,10 +409,15 @@ class TrainModel:
              lambd=0.0001,t0=1000000.0,
              max_iter=20,max_eval=None):
         if self.model == "simpleCNN":
-            self.training_model = SimpleCNN(encode_method=self.encode_method, concat_reverse=self.concat_reverse, init_method=init_method)
+            self.training_model = SimpleCNN(encode_method=self.encode_method, concat_reverse=self.concat_reverse, init_method=init_method,verbose=self.verbose)
+        elif self.model == "EPIMind":
+            self.training_model = EPIMind(concat_reverse=self.concat_reverse, init_method=init_method,
+                                          enhancer_len=self.enhancer_len, promoter_len=self.promoter_len,
+                                          num_heads=self.num_heads, num_layers=self.num_layers,
+                                          num_hiddens=self.num_hiddens, ffn_num_hiddens=self.ffn_num_hiddens,verbose=self.verbose
+                                          )
             pass
         if (not self.rerun) and self.save_param_dir is not None and self.save_param_prefix is not None:
-            # print('撒大声地')
             check_and_create_dir(self.save_param_dir)
             loading_res = load_weigths(self.save_param_dir, self.save_param_prefix)
             # print("loading_res: {}".format(loading_res))
@@ -410,7 +430,7 @@ class TrainModel:
             fprint(msg="The model will rerun!!!")
             pass
         self.training_model.to(self.device)
-        fprint(msg='training on'+self.device)
+        fprint(msg='training on '+self.device)
         # self.training_model.apply(init_weights)
         if optim.lower() == "sgd":
             self.optim = torch.optim.SGD(self.training_model.parameters(),lr=lr,momentum=momentum,weight_decay=weight_decay,nesterov=nesterov)
@@ -507,7 +527,11 @@ class TrainModel:
                             save_path = "{}_{}.pdf".format(self.save_path,format_dict_to_filename(param_dict))
                             metrics = kfold_cross_validation(self.encode_method, self.concat_reverse,self.workers, self.timer, k_fold, None, self.epochs, self.batch_size,
                                                              self.model, self.init_method, self.optim, dataset, self.metrics,
-                                                             save_path, self.device, self.verbose)
+                                                             save_path,
+                                                             self.enhancer_len, self.promoter_len, self.num_heads, self.num_layers,  self.num_hiddens,
+                                                             self.
+                                                             ffn_num_hiddens,
+                                                             self.device, self.verbose)
                             param_res_dict[self.metrics] = metrics
                             metrics_data_list.append(param_res_dict)
                             metrics_list.append(metrics)
@@ -549,7 +573,12 @@ class TrainModel:
                             save_path = "{}_{}.pdf".format(self.save_path,format_dict_to_filename(param_dict))
                             metrics = kfold_cross_validation(self.encode_method, self.concat_reverse,self.workers,self.timer, k_fold, None, self.epochs, self.batch_size,
                                                              self.model, self.init_method, self.optim, dataset, self.metrics,
-                                                             save_path, self.device, self.verbose)
+                                                             save_path,
+                                                             self.enhancer_len, self.promoter_len, self.num_heads,
+                                                             self.num_layers, self.num_hiddens,
+                                                             self.
+                                                             ffn_num_hiddens,
+                                                             self.device, self.verbose)
                             param_res_dict[self.metrics] = metrics
                             metrics_data_list.append(param_res_dict)
                             metrics_list.append(metrics)
@@ -581,7 +610,12 @@ class TrainModel:
                                                              self.timer, k_fold, None, self.epochs, int(batch_size),
                                                              self.model, self.init_method, self.optim, dataset,
                                                              self.metrics,
-                                                             save_path, self.device, self.verbose)
+                                                             save_path,
+                                                             self.enhancer_len, self.promoter_len, self.num_heads,
+                                                             self.num_layers, self.num_hiddens,
+                                                             self.
+                                                             ffn_num_hiddens,
+                                                             self.device, self.verbose)
                             return metrics
                         print(param_grid)
                         optimizer = BayesianOptimization(f=optimize_function,pbounds=param_grid,
@@ -597,7 +631,12 @@ class TrainModel:
                 else:
                     metrics = kfold_cross_validation(self.encode_method, self.concat_reverse, self.workers, self.timer,k_fold, log_writer, self.epochs, self.batch_size,
                                                      self.model, self.init_method, self.optim, dataset, self.metrics,
-                                                     self.save_path, self.device, self.verbose)
+                                                     self.save_path,
+                                                     self.enhancer_len, self.promoter_len, self.num_heads,
+                                                     self.num_layers, self.num_hiddens,
+                                                     self.
+                                                     ffn_num_hiddens,
+                                                     self.device, self.verbose)
 
         self.timer.final_stop()
         fprint(msg="Total time: {}s".format(self.timer.final_elapsed_time()))
