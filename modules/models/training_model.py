@@ -62,31 +62,34 @@ def train_each(epoch, log_writer, log_mode, model, data_loader,test_loader, opti
         loss = criterion(output, label)
         train_acc = accuracy(output, label) / label.numel()
         # model.eval()
-        test_loss = 0
-        correct = 0
+        # test_loss = 0
+        # correct = 0
         if test_loader:
             # test_len = len(test_loader)
             with torch.no_grad():
                 for index,(data, label) in enumerate(test_loader):
-                    data = data.to(device)
-                    label = label.to(device)
-                    label = torch.flatten(label)
-                    # print(label)
-                    # label = label.long()
-                    # print("label: {}".format(label.shape))
-                    # enhancer_X = torch.permute(data[:, :, 1:5], (0, 2, 1))
-                    #
-                    # promoter_X = torch.permute(data[:, :, 5:9], (0, 2, 1))
-                    output = model(data)
-                    # print("output: {}".format(output))
-                    test_loss += criterion(output, label).item()
-                    pred = output.argmax(dim=1, keepdim=True)
-                    correct += pred.eq(label.view_as(pred)).sum().item()
+
+                    if index == 0:
+                        data = data.to(device)
+                        label = label.to(device)
+                        label = torch.flatten(label)
+                        # print(label)
+                        # label = label.long()
+                        # print("label: {}".format(label.shape))
+                        # enhancer_X = torch.permute(data[:, :, 1:5], (0, 2, 1))
+                        #
+                        # promoter_X = torch.permute(data[:, :, 5:9], (0, 2, 1))
+                        output = model(data)
+                        # print("output: {}".format(output))
+                        test_loss = criterion(output, label).item()
+                        pred = output.argmax(dim=1, keepdim=True)
+                        # test_accuracy = pred.eq(label.view_as(pred)).sum().item()
+                        test_accuracy = accuracy(output, label) / label.numel()
                     # print("index:{}".format(index))
                     # print("correct:{}".format(correct))
 
-                test_loss /= label.numel()
-                test_accuracy = correct / label.numel()
+                # test_loss /= label.numel()
+                # test_accuracy = correct / label.numel()
             if verbose:
                 print("Epoch: {}, batch: {}, loss: {:4f}, train acc: {:2f}, test acc: {:2f}".format(epoch, batch,loss.data,train_acc,test_accuracy))
         else:
