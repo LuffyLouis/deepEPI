@@ -63,33 +63,35 @@ def train_each(epoch, log_writer, log_mode, model, data_loader,test_loader, opti
         # print("output: {}".format(output.shape))
         loss = criterion(output, label)
         # print(label)
-        train_acc = paddle.static.accuracy(output, paddle.reshape(label,shape=[-1,1])) / label.numel()
-        # model.eval()
-        test_loss = 0
-        correct = 0
+        train_acc = paddle.static.accuracy(output, paddle.reshape(label,shape=[-1,1]))
+        # # model.eval()
+        # test_loss = 0
+        # correct = 0
         if test_loader:
             # test_len = len(test_loader)
             with paddle.no_grad():
                 for index,(data, label) in enumerate(test_loader):
                     # data = data.to(device)
                     # label = label.to(device)
-                    label = paddle.flatten(label)
-                    # print(label)
-                    # label = label.long()
-                    # print("label: {}".format(label.shape))
-                    # enhancer_X = paddle.permute(data[:, :, 1:5], (0, 2, 1))
-                    #
-                    # promoter_X = paddle.permute(data[:, :, 5:9], (0, 2, 1))
-                    output = model(data)
-                    # print("output: {}".format(output))
-                    test_loss += criterion(output, label).item()
-                    pred = output.argmax(axis=1, keepdim=True)
-                    correct += pred.equal(label.reshape(pred.shape)).sum().item()
+                    if index == 0:
+                        label = paddle.flatten(label)
+                        # print(label)
+                        # label = label.long()
+                        # print("label: {}".format(label.shape))
+                        # enhancer_X = paddle.permute(data[:, :, 1:5], (0, 2, 1))
+                        #
+                        # promoter_X = paddle.permute(data[:, :, 5:9], (0, 2, 1))
+                        output = model(data)
+                        # print("output: {}".format(output))
+                        # test_loss = criterion(output, label).item()
+                        # pred = output.argmax(axis=1, keepdim=True)
+                        # test_accuracy = pred.equal(label.reshape(pred.shape)).sum().item()
+                        test_accuracy = paddle.static.accuracy(output, paddle.reshape(label, shape=[-1, 1]))
                     # print("index:{}".format(index))
                     # print("correct:{}".format(correct))
 
-                test_loss /= label.numel()
-                test_accuracy = correct / label.numel()
+                # test_loss /= label.numel()
+                # test_accuracy = correct / label.numel()
             if verbose:
                 print("Epoch: {}, batch: {}, loss: {:4f}, train acc: {:2f}, test acc: {:2f}".format(epoch, batch,float(loss),float(train_acc),float(test_accuracy)))
         else:
@@ -293,7 +295,7 @@ def init_summary_writer(log_dir='./cache/log'):
     return writer
 
 def check_device():
-    if paddle.version.cuda():
+    if paddle.version.cuda() != "False":
         print("CUDA is available.")
     else:
         print("CUDA is not available.")
@@ -403,7 +405,7 @@ class TrainModel:
         ##
         check_device()
         if self.device is None:
-            self.device = paddle.device("cuda" if paddle.cuda.is_available() else "cpu")
+            self.device = "gpu" if paddle.device.cuda.device_count() > 0 else "cpu"
         self.init(self.init_method,self.optimizer,self.lr,self.momentum,self.weight_decay,self.nesterov,
              self.betas,self.eps,self.lr_decay,self.initial_accumulator_value,
              self.rho,self.alpha,
