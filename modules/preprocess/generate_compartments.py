@@ -46,7 +46,7 @@ class GenerateCompartments:
             for index_job, item in enumerate(task):
                 output_file = output_file_format.format(chroms[item], human_read_length(bin_size))
                 p = Process(target=generate_compartments_each,
-                            args=(juicer_tools_path, hic_file, method, chrom_list, flag, bin_size, output_file,))
+                            args=(juicer_tools_path, hic_file, method, chroms[item], flag, bin_size, output_file,))
                 p.daemon = True
                 # atexit.register(exit_handler,p)
                 p.start()

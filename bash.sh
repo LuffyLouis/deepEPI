@@ -1,13 +1,38 @@
-#### Preprocess the valid pairs generated from HiC-Pro
+#### Set the config
+WORK_DIR=/home/hfliu/work/deepEPI
+DATASET_DIR=$WORK_DIR/dataset
+INPUT_DIR=$WORK_DIR/input
+OUTPUT_DIR=$WORK_DIR/output
+CACHE_DIR=$WORK_DIR/cache
+TEMP_DIR=$WORK_DIR/temp
+LOG_DIR=$WORK_DIR/log
+MODEL_DIR=$WORK_DIR/model
+FIG_DIR=$WORK_DIR/fig
+DeepEPI_DIR=$WORK_DIR/deepEPI
+SOFTWARE_DIR=/home/hfliu/software
+## create directories
+mkdir -p $DATASET_DIR
+mkdir -p $INPUT_DIR
+mkdir -p $OUTPUT_DIR
+mkdir -p $CACHE_DIR
+mkdir -p $LOG_DIR
+mkdir -p $MODEL_DIR
+mkdir -p $FIG_DIR
+mkdir -p $TEMP_DIR
+#### Pull repository
+git clone https://github.com/LuffyLouis/deepEPI
+git pull origin paddle_version
 
-python main.py Preprocess --hic_file ./SRR400264_00.allValidPairs.hic \
---input ./SRR400264_00.allValidPairs \
---juicer_tools_path juicer_tools_1.22.01.jar --threads 2 \
---chrom_size_file ./hg38.chrom_size \
---method KR --flag BP --bin_size 500000 --output_dir ./output --output_prefix eigen_ \
---distance 1e6 --within_compartment 2 --promoter -a ./hg38.refGene.gtf \
---temp_dir ./temp --output output/filt_interactions.txt \
---output_raw output/filt_interactions_raw.txt
+#### Preprocess the valid pairs generated from HiC-Pro
+mkdir -p $OUTPUT_DIR/compartment
+python $DeepEPI_DIR/main.py Preprocess -s generate_compartments --hic_file $INPUT_DIR/SRR400264_00.allValidPairs.hic \
+--input $INPUT_DIR/SRR400264_00.allValidPairs \
+--juicer_tools_path $SOFTWARE_DIR/juicer_tools.3.0.0.jar --threads 2 \
+--chrom_size_file $INPUT_DIR/hg38.chrom_size \
+--method KR --flag BP --bin_size 500000 --output_dir $OUTPUT_DIR/compartment --output_prefix eigen_ \
+--distance 1e6 --within_compartment 2 --promoter -a $INPUT_DIR/hg38.refGene.gtf \
+--temp_dir $TEMP_DIR --output $OUTPUT_DIR/filt_interactions.txt \
+--output_raw $OUTPUT_DIR/filt_interactions_raw.txt
 
 python main.py Preprocess --hic_file /home/luffy/liuhongfei/deepEPI/SRR400264_00.allValidPairs.hic \
 --input /home/luffy/liuhongfei/deepEPI/SRR400264_00.allValidPairs \
