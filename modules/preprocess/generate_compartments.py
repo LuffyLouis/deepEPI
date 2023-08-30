@@ -18,13 +18,16 @@ def generate_compartments_each(juicer_tools_path, hic_file,method, chrom, flag, 
 
 
 class GenerateCompartments:
-    def __init__(self, juicer_tools_path, hic_file, threads,chrom_size_file, method, flag,
+    def __init__(self, juicer_tools_path, hic_file, threads,chrom_size_file,
+                 keep_chrom_file, discard_chrom_file,
+                 method, flag,
                  bin_size, output_dir,output_prefix,verbose):
 
         self.juicer_tools_path, self.threads, self.method, self.flag, self.bin_size, self.output_dir = \
             juicer_tools_path, threads,method, flag, bin_size, output_dir
         self.hic_file = hic_file
         self.chrom_size_file = chrom_size_file
+        self.keep_chrom_file, self.discard_chrom_file = keep_chrom_file, discard_chrom_file
         self.output_prefix, self.verbose = output_prefix,verbose
         pass
 
@@ -70,7 +73,10 @@ class GenerateCompartments:
                 sys.exit(-1)
 
     def run(self):
-        self.chroms = read_chrom_size(self.chrom_size_file)
+        chrom_size_data = read_chrom_size(self.chrom_size_file, return_type="raw")
+        chrom_size_data_filt = filt_chrom(chrom_size_data, self.keep_chrom_file, self.discard_chrom_file)
+        self.chroms = chrom_size_data_filt.iloc[:, 0].to_list()
         self.generate_compartments(self.juicer_tools_path,self.hic_file, self.threads, self.chroms, self.method,
                                    self.flag, self.bin_size, self.output_dir,self.output_prefix, verbose=self.verbose)
+
 
