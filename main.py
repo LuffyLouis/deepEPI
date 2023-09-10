@@ -7,6 +7,7 @@ import sys
 # import os
 from modules.datasets.prep_datasets import PrepDatasets
 from modules.models.training_model import TrainModel
+from modules.predict.predict import PredictEPI
 from modules.preprocess import generate_compartments, generate_interactions, filtration, balance, extract_seqs
 from modules.logger import progress_logger
 from modules.utils import *
@@ -45,7 +46,7 @@ subparsers = parser.add_subparsers(title="Module",dest="module",help="Run specif
                        "    split_datasets: split the dataset into different parts, including training, validation, and test dataset\n"
                        "Train: Train the datasets with a specific model\n"
                        "Evaluation: Evaluate the performance under the current trained model with some metrics\n"
-                       "Prediction: Predict the Enhancer-Promoter interaction with a specifc model", metavar="MODULE")
+                       "Predict: Predict the Enhancer-Promoter interaction with a specifc model", metavar="MODULE")
 
 # parser.add_argument("-m", "--module", dest="module",default="all",
 #                   help="Run specific module to run. The following modules are provided (note: if the main module was specified, all steps in this main module will be implemented):\n"
@@ -296,6 +297,85 @@ train_module.add_argument("--log_dir",default="log",help="the logger directory")
 train_module.add_argument("--save_model",help="whether to save model and if so, rhe corresponding save path")
 train_module.add_argument("--verbose",action="store_true", default=False, help="whether to open the verbose mode")
 
+
+predict_module = subparsers.add_parser("Predict",formatter_class=argparse.RawTextHelpFormatter)
+predict_module.add_argument("--threads",type=int,default=1,help="threads (default=1)")
+predict_module.add_argument("--enhancer_file",help="input .h5 file for enhancer")
+predict_module.add_argument("--promoter_file",help="input .h5 file for promoter")
+predict_module.add_argument("-e","--enhancer_seq",help="enhancer_seq")
+predict_module.add_argument("-p","--promoter_seq",help="promoter_seq")
+
+predict_module.add_argument("--pretrained_vec_file", help="the pretrained dna2vec file when the encode_method was set to dna2vec")
+predict_module.add_argument("--k_mer", default=6, help="the k value of k-mer or k-list specified when the encode_method was set to dna2vec\n"
+                                                         "multiple k-mer must be separated by comma, e.g. 4,5,6\n"
+                                                         "default=6, which means 6-mer")
+predict_module.add_argument("--trim",default="both", help="the triming strategy\n"
+                                                            "optional parameters: left, right, both\n"
+                                                     "default=both")
+predict_module.add_argument("--padding",default="both", help="the padding strategy\n"
+                                                               "optional parameters: left, right, both\n"
+                                                     "default=both")
+
+predict_module.add_argument("--model", default="simpleCNN",help="the model selected to train\n"
+                                         "optional: \n"
+                                         "  simpleCNN\n"
+                                         "  CNN\n"
+                                         "  EPIMind")
+predict_module.add_argument("--encode_method",default="onehot",help="the RegExp pattern of input .h5 files")
+predict_module.add_argument("--concat_reverse",action="store_true",default=False,help="the RegExp pattern of input .h5 files")
+predict_module.add_argument("--concat_epi", action="store_true",default=False,help="whether to concat the enhancer and promoter together\n"
+                                                               "If not, the {dataset_name}_seq1 and {dataset_name}_seq2 will be generated separately\n"
+                                                               )
+#
+predict_module.add_argument("--enhancer_len",type=float,default=4e3,help="the max length of enhancer")
+predict_module.add_argument("--promoter_len",type=float,default=2e3,help="the max length of promoter")
+predict_module.add_argument("--heads",type=int,default=8,help="the number of heads in multi-head attention")
+predict_module.add_argument("--num_layers",type=int,default=4,help="the number of stacks of encoder")
+predict_module.add_argument("--num_hiddens",type=int,default=72,help="the number of elements in hidden layer")
+predict_module.add_argument("--ffn_num_hiddens",type=int,default=256,help="the number of elements in hidden layer in Feed forward hidden layer")
+
+
+predict_module.add_argument("--device",default=None,help="the physical device to train the model\n"
+                                                        "optional: cpu, cuda or other else supported in pytorch\n"
+                                                        "default=None, which means it will use the cuda firstly if with Nvidia GPU, and if not, the cpu will be used")
+predict_module.add_argument("--save_param_dir",default="cache",help="whether to save parameters and if so, the corresponding saved directory")
+predict_module.add_argument("--save_param_prefix",default="weights",help="whether to save parameters and if so, the corresponding saved file prefix")
+predict_module.add_argument("--verbose",action="store_true", default=False, help="whether to open the verbose mode")
+
+
+#
+# enhancer_file = arg.enhancer_file
+#         promoter_file = arg.promoter_file
+#         enhancer_seq,promoter_seq = arg.enhancer_seq, arg.promoter_seq
+#         model = arg.model
+#         concat_epi, trim, padding, k_mer, pretrained_vec_file, threads = arg.concat_epi,arg.trim, arg.padding,arg.k_mer,arg.pretrained_vec_file,arg.threads
+#         # train_dataset_dir,train_dataset_pattern,model,is_param_optim = \
+#         #     arg.train_dataset_dir,arg.train_dataset_pattern,arg.model,arg.is_param_optim
+#         # workers = arg.workers
+#
+#         enhancer_len, promoter_len, heads, num_layers, num_hiddens, ffn_num_hiddens = \
+#             arg.enhancer_len,arg.promoter_len,arg.heads,arg.num_layers,arg.num_hiddens,arg.ffn_num_hiddens
+#
+#         encode_method, concat_reverse = arg.encode_method,arg.concat_reverse
+#         # param_optim_strategy,k_fold,epochs, lr, optimizer, batch_size,  momentum = \
+#         #     arg.param_optim_strategy,arg.k_fold,arg.epochs, arg.lr, arg.optimizer, arg.batch_size,  arg.momentum
+#         # init = arg.init
+#         device = arg.device
+#         save_param_dir = arg.save_param_dir
+#         # device, random_state, save_param_dir, save_model = arg.device, arg.random_state, arg.save_param_dir, arg.save_model
+#         # params_config = arg.params_config
+#         # random_size = arg.random_size
+#         # init_points, n_iter = arg.init_points,arg.n_iter
+#         ##
+#         # weight_decay, nesterov, betas, eps, lr_decay, initial_accumulator_value, rho, alpha, \
+#         #                  lambd, t0, max_iter, max_eval = arg.weight_decay, arg.nesterov, arg.betas, arg.eps, arg.lr_decay, arg.initial_accumulator_value, arg.rho, arg.alpha, \
+#         #                  arg.lambd, arg.t0, arg.max_iter, arg.max_eval
+#         save_param_prefix = arg.save_param_prefix
+#         # rerun = arg.rerun
+#         # save_fig = arg.save_fig
+#         # metrics = arg.metrics
+#         # log_dir = arg.log_dir
+#         verbose = arg.verbose
 # preprocess_module.add_argument("-s","--step",dest="step",default=None, help="choose specific step to run\n"
 #                                            "    generate_interactions: generate valid interactions within compartment A/B\n"
 #                                            "    filtration: filt the valid interactions based on user specified parameters\n"
@@ -562,6 +642,54 @@ def main():
                                  device, random_state,
                                  rerun, save_param_dir, save_param_prefix,log_dir, save_model, verbose)
         train_model.run()
+        # try:
+        #     train_model = TrainModel(train_dataset_dir, train_dataset_pattern, train_dataset_file, model, is_param_optim, param_optim_strategy, k_fold,
+        #          epochs, lr, optimizer, batch_size,momentum,device,random_state,
+        #          save_param, save_model, verbose)
+        #     train_model.run()
+        # except Exception as e:
+        #     print(e)
+        #     sys.exit(-1)
+
+    elif module == "Predict":
+        enhancer_file = arg.enhancer_file
+        promoter_file = arg.promoter_file
+        enhancer_seq,promoter_seq = arg.enhancer_seq, arg.promoter_seq
+        model = arg.model
+        concat_epi, trim, padding, k_mer, pretrained_vec_file, threads = arg.concat_epi,arg.trim, arg.padding,arg.k_mer,arg.pretrained_vec_file,arg.threads
+        # train_dataset_dir,train_dataset_pattern,model,is_param_optim = \
+        #     arg.train_dataset_dir,arg.train_dataset_pattern,arg.model,arg.is_param_optim
+        # workers = arg.workers
+
+        enhancer_len, promoter_len, heads, num_layers, num_hiddens, ffn_num_hiddens = \
+            arg.enhancer_len,arg.promoter_len,arg.heads,arg.num_layers,arg.num_hiddens,arg.ffn_num_hiddens
+
+        encode_method, concat_reverse = arg.encode_method,arg.concat_reverse
+        # param_optim_strategy,k_fold,epochs, lr, optimizer, batch_size,  momentum = \
+        #     arg.param_optim_strategy,arg.k_fold,arg.epochs, arg.lr, arg.optimizer, arg.batch_size,  arg.momentum
+        # init = arg.init
+        device = arg.device
+        save_param_dir = arg.save_param_dir
+        # device, random_state, save_param_dir, save_model = arg.device, arg.random_state, arg.save_param_dir, arg.save_model
+        # params_config = arg.params_config
+        # random_size = arg.random_size
+        # init_points, n_iter = arg.init_points,arg.n_iter
+        ##
+        # weight_decay, nesterov, betas, eps, lr_decay, initial_accumulator_value, rho, alpha, \
+        #                  lambd, t0, max_iter, max_eval = arg.weight_decay, arg.nesterov, arg.betas, arg.eps, arg.lr_decay, arg.initial_accumulator_value, arg.rho, arg.alpha, \
+        #                  arg.lambd, arg.t0, arg.max_iter, arg.max_eval
+        save_param_prefix = arg.save_param_prefix
+        # rerun = arg.rerun
+        # save_fig = arg.save_fig
+        # metrics = arg.metrics
+        # log_dir = arg.log_dir
+        verbose = arg.verbose
+
+        predict_model = PredictEPI(model,
+                 encode_method,concat_reverse,enhancer_len,promoter_len,heads,num_layers,num_hiddens,ffn_num_hiddens,
+                 concat_epi,trim, padding,k_mer,pretrained_vec_file,threads,
+                 save_param_dir, save_param_prefix,enhancer_seq,promoter_seq,enhancer_file,promoter_file,device,verbose)
+        predict_model.run()
         # try:
         #     train_model = TrainModel(train_dataset_dir, train_dataset_pattern, train_dataset_file, model, is_param_optim, param_optim_strategy, k_fold,
         #          epochs, lr, optimizer, batch_size,momentum,device,random_state,

@@ -16,6 +16,10 @@ from modules.utils import *
 from modules.utils.encode import DNA2VecEncoder
 from modules.utils.memory import MemoryUseReporter, convert_bytes_to_human_readable
 
+# from deepEPI.modules.utils.sequence import trim_string_to_length, left_pad_string, right_pad_string, center_pad_string
+# from deepEPI.modules.utils.timer import Timer
+# from deepEPI.modules.utils.tools import fprint, check_and_create_dir, format_location
+
 
 class ExtractDatasets(ChunkReadAndRunThread):
     """
@@ -24,7 +28,7 @@ class ExtractDatasets(ChunkReadAndRunThread):
     """
     def __init__(self, balanced_interaction_file, raw_interaction_fasta_file, dataset_name, concat_reverse,
                  enhancer_length,promoter_length, trim, padding, compression, concat_epi, pretrained_vec_file, k_mer,
-                 encode_method, temp_dir, output_dir, output, threads, chunk_size, verbose):
+                 encode_method, temp_dir, output_dir, output, threads, chunk_size, verbose=True,training=True):
         super().__init__()
 
         # self.k_mer = k_mer
@@ -71,6 +75,7 @@ class ExtractDatasets(ChunkReadAndRunThread):
         self.temp_output_prefix = "temp_extract_{}"
 
         self.verbose = verbose
+        self.training = training
         self.colnames = ["reads_name", "chrom1", "start1", "strand1", "chrom2", "start2", "strand2", "length",
                          "bin_name1", "bin_name2", "bin_index1", "bin_index2", "Unknown",
                          "compartment1", "compartment2", "compartment1_region", "compartment2_region", "end1", "end2",
@@ -341,7 +346,6 @@ class ExtractDatasets(ChunkReadAndRunThread):
             #     seq_concat = np.r_[seq1_encoded, seq2_encoded]
 
             if self.concat_reverse:
-                print("asdsadsa")
                 seq1_reverse = self.extract_seq(raw_interactions_fasta, enhancer_id, enhancer_strand, reverse=True)
                 seq2_reverse = self.extract_seq(raw_interactions_fasta, promoter_id, promoter_strand, reverse=True)
                 seq1_reverse_encoded = self.encode_seq(self.process_seq(seq1_reverse,self.enhancer_length), self.enhancer_length)
@@ -367,7 +371,9 @@ class ExtractDatasets(ChunkReadAndRunThread):
             # break
 
         ## encode seqs and convert them into h5 format
-        label = np.array(temp_data.loc[:, "label"]).reshape((-1, 1, 1))
+        # if self.training:
+        #     label = np.array(temp_data.loc[:, "label"]).reshape((-1, 1, 1))
+
         data_chunk = np.array(data_chunk)
         print(data_chunk.shape)
         data_chunk_seq1 = np.array(data_chunk_seq1)
@@ -384,7 +390,9 @@ class ExtractDatasets(ChunkReadAndRunThread):
                            compression=None)
             self.export_h5(temp_file, dataset_name + "_promoter", data_chunk_seq2, chunks=False, rewrite=False,
                            compression=None)
-        self.export_h5(temp_file, dataset_name + "_label", label, chunks=False, rewrite=False, compression=None)
+        if self.training:
+            label = np.array(temp_data.loc[:, "label"]).reshape((-1, 1, 1))
+            self.export_h5(temp_file, dataset_name + "_label", label, chunks=False, rewrite=False, compression=None)
         # self.mutex.release()
         pass
 
