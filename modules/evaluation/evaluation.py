@@ -4,6 +4,9 @@ from scipy import interp
 from scipy.interpolate import interp1d
 
 from sklearn.metrics import roc_curve, precision_recall_curve, auc, f1_score
+from thop import profile
+from thop import clever_format
+
 import pandas as pd
 
 
@@ -89,3 +92,15 @@ class ModelEvaluator:
         }
         df = pd.DataFrame(results)
         df.to_csv(filename, index=False)
+
+
+class PerformanceEvaluator:
+    def __init__(self,model,inputs):
+        self.macs, self.params = profile(model, inputs=(inputs,))
+        # self.clever_macs, self.clever_params = clever_format([self.macs, self.params], "%.3f")
+        pass
+
+    def clever_format(self,macs):
+        return clever_format(macs, "%.3f")
+
+

@@ -1,9 +1,11 @@
 import sys
+import time
 from datetime import datetime
 import os
 import re
 
 import numpy as np
+import thop
 import torch
 from matplotlib import pyplot as plt
 from sklearn.model_selection import KFold
@@ -18,7 +20,7 @@ from tensorboardX import SummaryWriter
 # from d2l import torch as d2l
 from modules import fprint, check_and_create_dir, format_dict_to_filename, read_config_file, Timer
 from modules.datasets.datasets import EPIDatasets
-from modules.evaluation.evaluation import ModelEvaluator
+from modules.evaluation.evaluation import ModelEvaluator, PerformanceEvaluator
 from modules.models.models import SimpleCNN, init_weights, EPIMind
 #
 # torch.backends.cudnn.enabled = False
@@ -30,26 +32,48 @@ from modules.models.models import SimpleCNN, init_weights, EPIMind
 from modules.models.tools import accuracy
 
 
-def train_each(epoch, log_writer, log_mode, model, data_loader,test_loader, optimizer, device,verbose):
+def train_each(epoch, log_writer, log_mode, model, data_loader,test_loader, optimizer, device, verbose):
     # optimizer = torch.optim.SGD(model.parameters(),lr=0.1,momentum=0.9)
     # 初始化logWriter
 
     loss = None
     model.train()
     criterion = nn.CrossEntropyLoss()
+
+
     for batch, (data, label) in enumerate(data_loader):
+
 
         # print(data.shape)
         # print(labels.shape)
         data = data.to(device)
         label = label.to(device)
         label = torch.flatten(label)
+
+        # print(data.shape)
         # print(label)
         # label = label.long()
         # print("label: {}".format(label.shape))
         # enhancer_X = torch.permute(data[:, :, 1:5],(0,2,1))
         # promoter_X = torch.permute(data[:, :, 5:9],(0,2,1))
         if epoch == 0 and batch == 0:
+            # training_model_perf.to(device)
+            # print(data.shape)
+            start = time.time()
+            # training_model_perf.eval()
+            # model = thop.replace_count_softmax(training_model_perf)
+
+            performanceEvaluator = PerformanceEvaluator(model, data)
+
+            # model = EPIMind()
+            # performanceEvaluator = PerformanceEvaluator(model, data)
+            end = time.time()
+            macs, params = performanceEvaluator.clever_format(
+                [performanceEvaluator.macs / (end - start), performanceEvaluator.params])
+            print("-----------------------------")
+            print("FLOPS: {}FLOPS".format(macs))
+            print("Params: {}".format(params))
+            print("-----------------------------")
             if log_writer:
                 log_writer.add_graph(model, data)
 
@@ -58,7 +82,7 @@ def train_each(epoch, log_writer, log_mode, model, data_loader,test_loader, opti
         # print(label.shape)
         # print("data: {}".format(data.shape))
         output = model(data)
-        # print("output: {}".format(output.shape))
+        print("output: {}".format(output.shape))
         loss = criterion(output, label)
         train_acc = accuracy(output, label) / label.numel()
         # model.eval()
@@ -153,6 +177,7 @@ def kfold_cross_validation(encode_method, concat_reverse,workers,timer,
         # 训练模型
         for epoch in range(epoches):
             timer.start()
+
             ##
             train_each(epoch, log_writer, "", training_model, train_loader,None, optimizer, device, verbose)
             ##
@@ -413,13 +438,22 @@ class TrainModel:
              max_iter=20,max_eval=None):
         if self.model == "simpleCNN":
             self.training_model = SimpleCNN(encode_method=self.encode_method, concat_reverse=self.concat_reverse, init_method=init_method,verbose=self.verbose)
+            # self.training_model_perf = SimpleCNN(encode_method=self.encode_method, concat_reverse=self.concat_reverse, init_method=init_method,verbose=self.verbose)
         elif self.model == "EPIMind":
             self.training_model = EPIMind(concat_reverse=self.concat_reverse, init_method=init_method,
                                           enhancer_len=self.enhancer_len, promoter_len=self.promoter_len,
                                           num_heads=self.num_heads, num_layers=self.num_layers,
                                           num_hiddens=self.num_hiddens, ffn_num_hiddens=self.ffn_num_hiddens,verbose=self.verbose
                                           )
+            # self.training_model_perf = EPIMind(concat_reverse=self.concat_reverse, init_method=init_method,
+            #                               enhancer_len=self.enhancer_len, promoter_len=self.promoter_len,
+            #                               num_heads=self.num_heads, num_layers=self.num_layers,
+            #                               num_hiddens=self.num_hiddens, ffn_num_hiddens=self.ffn_num_hiddens,
+            #                               verbose=self.verbose
+            #                               )
             pass
+
+
         if (not self.rerun) and self.save_param_dir is not None and self.save_param_prefix is not None:
             check_and_create_dir(self.save_param_dir)
             loading_res = load_weigths(self.save_param_dir, self.save_param_prefix)
