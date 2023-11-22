@@ -82,7 +82,7 @@ def train_each(epoch, log_writer, log_mode, model, data_loader,test_loader, opti
         # print(label.shape)
         # print("data: {}".format(data.shape))
         output = model(data)
-        print("output: {}".format(output.shape))
+        # print("output: {}".format(output.shape))
         loss = criterion(output, label)
         train_acc = accuracy(output, label) / label.numel()
         # model.eval()
