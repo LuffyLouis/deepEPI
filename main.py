@@ -70,9 +70,11 @@ preprocess_module.add_argument("-s","--step",dest="step",default=None,help="choo
 preprocess_module.add_argument("--input",help="the input file")
 preprocess_module.add_argument("--temp_dir",help="the temporary directory")
 preprocess_module.add_argument("--output",help="the output file")
-preprocess_module.add_argument("--threads",type=int,default=1,help="threads (default=1)")
+preprocess_module.add_argument("--threads",type=int,default=1,help="threads (default=1)\n"
+                                                                   "Note: it is not built for predict mode!!!")
 preprocess_module.add_argument("--chunksize",type=float,default=1e5,help="chunksize (default=1e5)")
-preprocess_module.add_argument("--verbose",action="store_true", default=False, help="whether to open the verbose mode")
+preprocess_module.add_argument("--verbose",action="store_true", default=False, help="whether to open the verbose mode\n"
+                                                                                    "default=False")
 
 preprocess_group = preprocess_module.add_argument_group("generate_compartments")
 preprocess_group.add_argument("--hic_file",help="the .hic file which can be generated from HiC-Pro")
@@ -200,6 +202,11 @@ datasets_module.add_argument("--compression",type=auto_type,default="gzip",help=
 
 datasets_module.add_argument("--verbose", action="store_true", default=False, help="whether to open the verbose mode")
 train_module = subparsers.add_parser("Train",formatter_class=argparse.RawTextHelpFormatter)
+train_module.add_argument('--nodes', default=1,type=int, metavar='N')
+train_module.add_argument('--gpus', default=1,type=int,help='number of gpus per node')
+train_module.add_argument('--nr', default=0, type=int,help='ranking within the nodes')
+train_module.add_argument('--master', default=None,help='the address of master node (IP:PORT)\n'
+                                                                 'e.g. 192.168.10.1:8888')
 train_module.add_argument("-i","--input",help="input .h5 file for training")
 train_module.add_argument("--test_input",default=None,help="input .h5 file for test")
 
@@ -317,6 +324,7 @@ predict_module.add_argument("--padding",default="both", help="the padding strate
                                                      "default=both")
 
 predict_module.add_argument("--model", default="simpleCNN",help="the model selected to train\n"
+                                                                "default=simpleCNN\n"
                                          "optional: \n"
                                          "  simpleCNN\n"
                                          "  CNN\n"
@@ -327,20 +335,29 @@ predict_module.add_argument("--concat_epi", action="store_true",default=False,he
                                                                "If not, the {dataset_name}_seq1 and {dataset_name}_seq2 will be generated separately\n"
                                                                )
 #
-predict_module.add_argument("--enhancer_len",type=float,default=4e3,help="the max length of enhancer")
-predict_module.add_argument("--promoter_len",type=float,default=2e3,help="the max length of promoter")
-predict_module.add_argument("--heads",type=int,default=8,help="the number of heads in multi-head attention")
-predict_module.add_argument("--num_layers",type=int,default=4,help="the number of stacks of encoder")
-predict_module.add_argument("--num_hiddens",type=int,default=72,help="the number of elements in hidden layer")
-predict_module.add_argument("--ffn_num_hiddens",type=int,default=256,help="the number of elements in hidden layer in Feed forward hidden layer")
+predict_module.add_argument("--enhancer_len",type=float,default=4e3,help="the max length of enhancer\n"
+                                                                         "default=4e3")
+predict_module.add_argument("--promoter_len",type=float,default=2e3,help="the max length of promoter\n"
+                                                                         "default=2e3")
+predict_module.add_argument("--heads",type=int,default=8,help="the number of heads in multi-head attention\n"
+                                                              "default=8")
+predict_module.add_argument("--num_layers",type=int,default=4,help="the number of stacks of encoder\n"
+                                                                   "default=4")
+predict_module.add_argument("--num_hiddens",type=int,default=72,help="the number of elements in hidden layer\n"
+                                                                     "default=72")
+predict_module.add_argument("--ffn_num_hiddens",type=int,default=256,help="the number of elements in hidden layer for Feed forward hidden layer\n"
+                                                                          "default=256")
 
 
 predict_module.add_argument("--device",default=None,help="the physical device to train the model\n"
                                                         "optional: cpu, cuda or other else supported in pytorch\n"
                                                         "default=None, which means it will use the cuda firstly if with Nvidia GPU, and if not, the cpu will be used")
-predict_module.add_argument("--save_param_dir",default="cache",help="whether to save parameters and if so, the corresponding saved directory")
-predict_module.add_argument("--save_param_prefix",default="weights",help="whether to save parameters and if so, the corresponding saved file prefix")
-predict_module.add_argument("--verbose",action="store_true", default=False, help="whether to open the verbose mode")
+predict_module.add_argument("--save_param_dir",default="cache",help="whether to save parameters and if so, the corresponding saved directory\n"
+                                                                    "default=cache")
+predict_module.add_argument("--save_param_prefix",default="weights",help="whether to save parameters and if so, the corresponding saved file prefix\n"
+                                                                         "default=weights")
+predict_module.add_argument("--verbose",action="store_true", default=False, help="whether to open the verbose mode\n"
+                                                                                 "default=False")
 
 
 #
@@ -630,7 +647,17 @@ def main():
         log_dir = arg.log_dir
         verbose = arg.verbose
 
-        train_model = TrainModel(train_dataset_dir, train_dataset_pattern, train_dataset_file,test_dataset_file,workers,
+        master = arg.master
+        nodes = arg.nodes
+        gpus = arg.gpus
+        nr = arg.nr
+        ddp_info = [nodes,gpus,nr,master]
+        # print(master.split(":")[0])
+        if master:
+            os.environ['MASTER_ADDR'] = master.split(":")[0]
+            os.environ['MASTER_PORT'] = master.split(":")[1]
+
+        train_model = TrainModel(ddp_info,train_dataset_dir, train_dataset_pattern, train_dataset_file,test_dataset_file, workers,
                                  model, encode_method, concat_reverse,
                                  enhancer_len, promoter_len, heads, num_layers, num_hiddens, ffn_num_hiddens,
                                  is_param_optim,

@@ -9,6 +9,7 @@ import torch
 from torch.utils.data import Dataset
 
 
+
 class EPIDatasets(Dataset):
     def __init__(self, data=None, label=None, cache_file_path=None, transform=None):
         self.label_key = "y"
@@ -22,6 +23,7 @@ class EPIDatasets(Dataset):
                 # self.data = np.array(self.read_h5(self.data_key, 0))
                 with h5py.File(self.cache_file_path, "r") as handle:
                     self.label = torch.tensor(handle[self.label_key], dtype=torch.long)
+                    self.data = torch.tensor(handle[self.data_key], dtype=torch.float32)
                 pass
                 # self.data, self.label = torch.load(self.cache_file_path)
             else:
@@ -68,6 +70,8 @@ class EPIDatasets(Dataset):
         if self.cache_file_path:
             data = self.read_h5(self.data_key, idx).clone().detach().type(torch.float32)
             label = self.read_h5(self.label_key, idx).clone().detach().type(torch.long)
+            # data = self.data[idx]
+            # label = self.label[idx]
         else:
             data = self.data[idx]
             label = self.label[idx]

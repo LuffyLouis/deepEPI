@@ -31,6 +31,11 @@ from modules.models.models import SimpleCNN, init_weights, EPIMind
 # torch.backends.cudnn.allow_tf32 = True
 from modules.models.tools import accuracy
 
+## DDP (DistributedDataParallel)
+import torch.multiprocessing as mp
+import torch.distributed as dist
+
+
 
 def train_each(epoch, log_writer, log_mode, model, data_loader,test_loader, optimizer, device, verbose):
     # optimizer = torch.optim.SGD(model.parameters(),lr=0.1,momentum=0.9)
@@ -42,12 +47,12 @@ def train_each(epoch, log_writer, log_mode, model, data_loader,test_loader, opti
 
 
     for batch, (data, label) in enumerate(data_loader):
-
-
-        # print(data.shape)
-        # print(labels.shape)
-        data = data.to(device)
-        label = label.to(device)
+        if device:
+            data = data.to(device)
+            label = label.to(device)
+        else:
+            data = data.cuda(non_blocking=True)
+            label = label.cuda(non_blocking=True)
         label = torch.flatten(label)
 
         # print(data.shape)
@@ -94,8 +99,12 @@ def train_each(epoch, log_writer, log_mode, model, data_loader,test_loader, opti
                 for index,(data, label) in enumerate(test_loader):
 
                     if index == 0:
-                        data = data.to(device)
-                        label = label.to(device)
+                        if device:
+                            data = data.to(device)
+                            label = label.to(device)
+                        else:
+                            data = data.cuda(non_blocking=True)
+                            label = label.cuda(non_blocking=True)
                         label = torch.flatten(label)
                         # print(label)
                         # label = label.long()
@@ -131,7 +140,6 @@ def train_each(epoch, log_writer, log_mode, model, data_loader,test_loader, opti
             pass
         # log_writer.add
     # log_writer.add_scalar("test accuracy", test_acc, epoch)
-
 
 
 def kfold_cross_validation(encode_method, concat_reverse,workers,timer,
@@ -363,7 +371,7 @@ def generate_param_combinations(hyperparameters):
 
 
 class TrainModel:
-    def __init__(self, train_dataset_dir, train_dataset_pattern, train_dataset_file,test_dataset_file,workers,
+    def __init__(self, ddp_info, train_dataset_dir, train_dataset_pattern, train_dataset_file,test_dataset_file,workers,
                  model, encode_method,concat_reverse,
                  enhancer_len,promoter_len,heads,num_layers,num_hiddens,ffn_num_hiddens,
                  is_param_optim, param_optim_strategy,params_config,random_size,
@@ -374,6 +382,20 @@ class TrainModel:
                  lambd, t0, max_iter, max_eval,
                  device, random_state,
                  rerun, save_param_dir, save_param_prefix, log_dir, save_model, verbose):
+
+
+        self.ddp_mode = False
+        ## Distributed training
+        self.ddp_info = ddp_info
+        self.nodes = self.ddp_info[0]
+        self.gpus = self.ddp_info[1]
+        self.nr = self.ddp_info[2]
+        self.master = self.ddp_info[3]
+        self.world_size = self.nodes * self.gpus
+        if self.master:
+            fprint(msg="Initializing the DDP mode...")
+            self.ddp_mode = True
+        ##
         self.n_iter = n_iter
         self.init_points = init_points
         self.encode_method = None
@@ -497,14 +519,15 @@ class TrainModel:
                     self.train_dataset_files.append(os.path.join(self.train_dataset_dir,file))
         current_log_dir = os.path.join(self.log_dir, datetime.now().strftime("%Y%m%d-%H%M%S"))
         log_writer = init_summary_writer(current_log_dir)
+        # log_writer = None
         if len(self.train_dataset_files) > 0:
             if self.k_fold:
                 fprint("WARNING","The multi-datasets with k-fold CV are only supported by general training mode now!!!")
                 pass
             for epoch in range(self.epochs):
                 for train_dataset_file in self.train_dataset_files:
-                    dataset = EPIDatasets(cache_file_path=train_dataset_file)
-                    train_dataloader = DataLoader(dataset,batch_size=self.batch_size,shuffle=False)
+                    train_dataset = EPIDatasets(cache_file_path=train_dataset_file)
+                    train_dataloader = DataLoader(train_dataset,batch_size=self.batch_size,shuffle=False)
                     test_dataset = EPIDatasets(cache_file_path=self.test_dataset_file)
                     test_dataloader = DataLoader(test_dataset, batch_size=self.batch_size, shuffle=False)
                     self.timer.start()
@@ -512,171 +535,232 @@ class TrainModel:
                     self.timer.stop()
                     fprint(msg="Cost: {:3f}s/Epoch".format(self.timer.elapsed_time()))
         else:
-            train_dataset_file = self.train_dataset_file
-            dataset = EPIDatasets(cache_file_path=train_dataset_file)
-            train_dataloader = DataLoader(dataset, batch_size=self.batch_size, shuffle=False,num_workers=self.workers)
-            test_dataset = EPIDatasets(cache_file_path=self.test_dataset_file)
-            test_dataloader = DataLoader(test_dataset, batch_size=self.batch_size, shuffle=False,num_workers=self.workers)
-            if self.k_fold is None:
+            if self.ddp_mode:
+                train_dataset = EPIDatasets(cache_file_path=self.train_dataset_file)
 
-                for epoch in range(self.epochs):
-                    self.timer.start()
-                    train_each(epoch, log_writer, "Train", self.training_model, train_dataloader,test_dataloader, self.optim, self.device, self.verbose)
-                    self.timer.stop()
-                    fprint(msg="Cost: {:.3f}s/Epoch".format(self.timer.elapsed_time()))
-                fprint(msg="Saving parameters of current model...")
-                save_weights(self.training_model, self.save_param_dir, self.save_param_prefix)
-                fprint(msg="Saved done!")
+
+                test_dataset = EPIDatasets(cache_file_path=self.test_dataset_file)
+
+                # ddp_train(gpu_rank,self.world_size,self.gpus,self.nr,self.timer,self.epochs,log_writer,
+                #           self.training_model,train_dataset,test_dataset,self.optim,
+                #             self.batch_size,self.workers,
+                #             self.save_param_dir,self.save_param_prefix,self.verbose)
+                fprint("WARNING","The ddp mode does not support the tensorboard now!!!")
+                mp.spawn(ddp_train, nprocs=self.gpus, args=(self.world_size,self.gpus,self.nr,self.timer,self.epochs,None,
+                          self.training_model,train_dataset,test_dataset,self.optim,
+                            self.batch_size,self.workers,
+                            self.save_param_dir,self.save_param_prefix,self.verbose,))
             else:
-                k_fold = KFold(n_splits=self.k_fold, shuffle=True, random_state=self.random_state)
-                # dataset = EPIDatasets(cache_file_path=self.train_dataset_file)
-                if self.is_param_optim and self.param_optim_strategy:
-                    param_dict = read_config_file(self.params_config)
-                    if self.param_optim_strategy.lower() == "grid":
-                        metrics_data_list = []
-                        metrics_list = []
-                        # param_grid = {
-                        #     # 'batch_size': [4],
-                        #     # 'learning_rate': [0.001, 0.01],
-                        #     'batch_size': [4, 8, 16, 32, 64],
-                        #     'learning_rate': [0.001,0.01,0.1,0.5]
-                        #     # 'max_epochs': [5, 10]
-                        # }
-                        param_combinations = list(generate_param_combinations(remove_null_key(param_dict)))
-                        for index,param_dict in enumerate(param_combinations):
-                            param_res_dict = {
-                                "params": param_dict,
-                                self.metrics: ""
-                            }
-                            if "max_epochs" in param_dict.keys():
-                                self.epochs = int(param_dict["max_epochs"])
-                            elif "batch_size" in param_dict.keys():
-                                self.batch_size = int(param_dict["batch_size"])
-                            elif "learning_rate" in param_dict.keys():
-                                self.lr = param_dict["learning_rate"]
+                train_dataset_file = self.train_dataset_file
+                train_dataset = EPIDatasets(cache_file_path=train_dataset_file)
+                train_dataloader = DataLoader(train_dataset, batch_size=self.batch_size, shuffle=False,num_workers=self.workers)
+                test_dataset = EPIDatasets(cache_file_path=self.test_dataset_file)
+                test_dataloader = DataLoader(test_dataset, batch_size=self.batch_size, shuffle=False,num_workers=self.workers)
+                if self.k_fold is None:
 
-                            print(param_res_dict)
-                            self.init(self.init_method, self.optimizer, self.lr, self.momentum,self.weight_decay,self.nesterov,
-                                 self.betas,self.eps,self.lr_decay,self.initial_accumulator_value,
-                                 self.rho,self.alpha,
-                                 self.lambd,self.t0,
-                                 self.max_iter,self.max_eval)
-                            save_path = "{}_{}.pdf".format(self.save_path,format_dict_to_filename(param_dict))
-                            metrics = kfold_cross_validation(self.encode_method, self.concat_reverse,self.workers, self.timer, k_fold, None, self.epochs, self.batch_size,
-                                                             self.model, self.init_method, self.optim, dataset, self.metrics,
-                                                             save_path,
-                                                             self.enhancer_len, self.promoter_len, self.num_heads, self.num_layers,  self.num_hiddens,
-                                                             self.
-                                                             ffn_num_hiddens,
-                                                             self.device, self.verbose)
-                            param_res_dict[self.metrics] = metrics
-                            metrics_data_list.append(param_res_dict)
-                            metrics_list.append(metrics)
-                            ## add the metrics for each param optimization step
-                            log_writer.add_scalar(self.metrics,metrics,index,display_name=format_dict_to_filename(param_dict))
-                        index = metrics_list.index(np.nanmax(metrics_list))
-                        fprint(msg="The final hyper-parameters is following:")
-                        print(metrics_data_list[index])
-                    elif self.param_optim_strategy.lower() == "random":
-                        metrics_data_list = []
-                        metrics_list = []
-                        # param_grid = {
-                        #     # 'batch_size': [4],
-                        #     # 'learning_rate': [0.001, 0.01],
-                        #     'batch_size': [4, 8, 16, 32, 64],
-                        #     'learning_rate': [0.001, 0.01, 0.1, 0.5]
-                        #     # 'max_epochs': [5, 10]
-                        # }
-                        param_combinations = list(generate_param_combinations(remove_null_key(param_dict)))
-                        random_param_combinations = np.random.choice(param_combinations,self.random_size)
-
-                        for index,param_dict in enumerate(random_param_combinations):
-                            param_res_dict = {
-                                "params": param_dict,
-                                self.metrics: ""
-                            }
-                            if "max_epochs" in param_dict.keys():
-                                self.epochs = param_dict["max_epochs"]
-                            elif "batch_size" in param_dict.keys():
-                                self.batch_size = param_dict["batch_size"]
-                            elif "learning_rate" in param_dict.keys():
-                                self.lr = param_dict["learning_rate"]
-
-                            self.init(self.init_method, self.optimizer, self.lr, self.momentum,self.weight_decay,self.nesterov,
-                                 self.betas,self.eps,self.lr_decay,self.initial_accumulator_value,
-                                 self.rho,self.alpha,
-                                 self.lambd,self.t0,
-                                 self.max_iter,self.max_eval)
-                            save_path = "{}_{}.pdf".format(self.save_path,format_dict_to_filename(param_dict))
-                            metrics = kfold_cross_validation(self.encode_method, self.concat_reverse,self.workers,self.timer, k_fold, None, self.epochs, self.batch_size,
-                                                             self.model, self.init_method, self.optim, dataset, self.metrics,
-                                                             save_path,
-                                                             self.enhancer_len, self.promoter_len, self.num_heads,
-                                                             self.num_layers, self.num_hiddens,
-                                                             self.
-                                                             ffn_num_hiddens,
-                                                             self.device, self.verbose)
-                            param_res_dict[self.metrics] = metrics
-                            metrics_data_list.append(param_res_dict)
-                            metrics_list.append(metrics)
-                            ## add the metrics for each param optimization step
-                            log_writer.add_scalar(self.metrics,metrics,index,display_name=format_dict_to_filename(param_dict))
-                        index = metrics_list.index(np.nanmax(metrics_list))
-                        fprint(msg="The final hyper-parameters is following:")
-                        print(metrics_data_list[index])
-                        pass
-
-                    elif self.param_optim_strategy.lower() == "bayes":
-                        param_grid = remove_null_key(param_dict)
-                        #     {
-                        #     # 'batch_size': [4],
-                        #     # 'learning_rate': [0.001, 0.01],
-                        #     'batch_size': (4, 64),
-                        #     'learning_rate': (0.001, 0.5)
-                        #     # 'max_epochs': [5, 10]
-                        # }
-                        def optimize_function(batch_size,learning_rate):
-                            self.init(self.init_method, self.optimizer, learning_rate, self.momentum, self.weight_decay,
-                                      self.nesterov,
-                                      self.betas, self.eps, self.lr_decay, self.initial_accumulator_value,
-                                      self.rho, self.alpha,
-                                      self.lambd, self.t0,
-                                      self.max_iter, self.max_eval)
-                            save_path = "{}_batch_size_{}_lr_{}.pdf".format(self.save_path,int(batch_size),learning_rate)
-                            metrics = kfold_cross_validation(self.encode_method, self.concat_reverse, self.workers,
-                                                             self.timer, k_fold, None, self.epochs, int(batch_size),
-                                                             self.model, self.init_method, self.optim, dataset,
-                                                             self.metrics,
-                                                             save_path,
-                                                             self.enhancer_len, self.promoter_len, self.num_heads,
-                                                             self.num_layers, self.num_hiddens,
-                                                             self.
-                                                             ffn_num_hiddens,
-                                                             self.device, self.verbose)
-                            return metrics
-                        print(param_grid)
-                        optimizer = BayesianOptimization(f=optimize_function,pbounds=param_grid,
-                                             verbose=2,
-                                             # verbose = 1 prints only when a maximum is observed, verbose = 0 is silent
-                                             random_state=self.random_state)
-                        optimizer.maximize(
-                            init_points=self.init_points,  # 执行随机搜索的步数
-                            n_iter=self.n_iter,  # 执行贝叶斯优化的步数
-                        )
-                        print(optimizer.max)
-
+                    for epoch in range(self.epochs):
+                        self.timer.start()
+                        train_each(epoch, log_writer, "Train", self.training_model, train_dataloader,test_dataloader, self.optim, self.device, self.verbose)
+                        self.timer.stop()
+                        fprint(msg="Cost: {:.3f}s/Epoch".format(self.timer.elapsed_time()))
+                    fprint(msg="Saving parameters of current model...")
+                    save_weights(self.training_model, self.save_param_dir, self.save_param_prefix)
+                    fprint(msg="Saved done!")
                 else:
-                    metrics = kfold_cross_validation(self.encode_method, self.concat_reverse, self.workers, self.timer,k_fold, log_writer, self.epochs, self.batch_size,
-                                                     self.model, self.init_method, self.optim, dataset, self.metrics,
-                                                     self.save_path,
-                                                     self.enhancer_len, self.promoter_len, self.num_heads,
-                                                     self.num_layers, self.num_hiddens,
-                                                     self.
-                                                     ffn_num_hiddens,
-                                                     self.device, self.verbose)
+                    k_fold = KFold(n_splits=self.k_fold, shuffle=True, random_state=self.random_state)
+                    # dataset = EPIDatasets(cache_file_path=self.train_dataset_file)
+                    if self.is_param_optim and self.param_optim_strategy:
+                        param_dict = read_config_file(self.params_config)
+                        if self.param_optim_strategy.lower() == "grid":
+                            metrics_data_list = []
+                            metrics_list = []
+                            # param_grid = {
+                            #     # 'batch_size': [4],
+                            #     # 'learning_rate': [0.001, 0.01],
+                            #     'batch_size': [4, 8, 16, 32, 64],
+                            #     'learning_rate': [0.001,0.01,0.1,0.5]
+                            #     # 'max_epochs': [5, 10]
+                            # }
+                            param_combinations = list(generate_param_combinations(remove_null_key(param_dict)))
+                            for index,param_dict in enumerate(param_combinations):
+                                param_res_dict = {
+                                    "params": param_dict,
+                                    self.metrics: ""
+                                }
+                                if "max_epochs" in param_dict.keys():
+                                    self.epochs = int(param_dict["max_epochs"])
+                                elif "batch_size" in param_dict.keys():
+                                    self.batch_size = int(param_dict["batch_size"])
+                                elif "learning_rate" in param_dict.keys():
+                                    self.lr = param_dict["learning_rate"]
 
-        self.timer.final_stop()
-        fprint(msg="Total time: {}s".format(self.timer.final_elapsed_time()))
+                                print(param_res_dict)
+                                self.init(self.init_method, self.optimizer, self.lr, self.momentum,self.weight_decay,self.nesterov,
+                                     self.betas,self.eps,self.lr_decay,self.initial_accumulator_value,
+                                     self.rho,self.alpha,
+                                     self.lambd,self.t0,
+                                     self.max_iter,self.max_eval)
+                                save_path = "{}_{}.pdf".format(self.save_path,format_dict_to_filename(param_dict))
+                                metrics = kfold_cross_validation(self.encode_method, self.concat_reverse,self.workers, self.timer, k_fold, None, self.epochs, self.batch_size,
+                                                                 self.model, self.init_method, self.optim, train_dataset, self.metrics,
+                                                                 save_path,
+                                                                 self.enhancer_len, self.promoter_len, self.num_heads, self.num_layers,  self.num_hiddens,
+                                                                 self.
+                                                                 ffn_num_hiddens,
+                                                                 self.device, self.verbose)
+                                param_res_dict[self.metrics] = metrics
+                                metrics_data_list.append(param_res_dict)
+                                metrics_list.append(metrics)
+                                ## add the metrics for each param optimization step
+                                log_writer.add_scalar(self.metrics,metrics,index,display_name=format_dict_to_filename(param_dict))
+                            index = metrics_list.index(np.nanmax(metrics_list))
+                            fprint(msg="The final hyper-parameters is following:")
+                            print(metrics_data_list[index])
+                        elif self.param_optim_strategy.lower() == "random":
+                            metrics_data_list = []
+                            metrics_list = []
+                            # param_grid = {
+                            #     # 'batch_size': [4],
+                            #     # 'learning_rate': [0.001, 0.01],
+                            #     'batch_size': [4, 8, 16, 32, 64],
+                            #     'learning_rate': [0.001, 0.01, 0.1, 0.5]
+                            #     # 'max_epochs': [5, 10]
+                            # }
+                            param_combinations = list(generate_param_combinations(remove_null_key(param_dict)))
+                            random_param_combinations = np.random.choice(param_combinations,self.random_size)
+
+                            for index,param_dict in enumerate(random_param_combinations):
+                                param_res_dict = {
+                                    "params": param_dict,
+                                    self.metrics: ""
+                                }
+                                if "max_epochs" in param_dict.keys():
+                                    self.epochs = param_dict["max_epochs"]
+                                elif "batch_size" in param_dict.keys():
+                                    self.batch_size = param_dict["batch_size"]
+                                elif "learning_rate" in param_dict.keys():
+                                    self.lr = param_dict["learning_rate"]
+
+                                self.init(self.init_method, self.optimizer, self.lr, self.momentum,self.weight_decay,self.nesterov,
+                                     self.betas,self.eps,self.lr_decay,self.initial_accumulator_value,
+                                     self.rho,self.alpha,
+                                     self.lambd,self.t0,
+                                     self.max_iter,self.max_eval)
+                                save_path = "{}_{}.pdf".format(self.save_path,format_dict_to_filename(param_dict))
+                                metrics = kfold_cross_validation(self.encode_method, self.concat_reverse,self.workers,self.timer, k_fold, None, self.epochs, self.batch_size,
+                                                                 self.model, self.init_method, self.optim, train_dataset, self.metrics,
+                                                                 save_path,
+                                                                 self.enhancer_len, self.promoter_len, self.num_heads,
+                                                                 self.num_layers, self.num_hiddens,
+                                                                 self.
+                                                                 ffn_num_hiddens,
+                                                                 self.device, self.verbose)
+                                param_res_dict[self.metrics] = metrics
+                                metrics_data_list.append(param_res_dict)
+                                metrics_list.append(metrics)
+                                ## add the metrics for each param optimization step
+                                log_writer.add_scalar(self.metrics,metrics,index,display_name=format_dict_to_filename(param_dict))
+                            index = metrics_list.index(np.nanmax(metrics_list))
+                            fprint(msg="The final hyper-parameters is following:")
+                            print(metrics_data_list[index])
+                            pass
+
+                        elif self.param_optim_strategy.lower() == "bayes":
+                            param_grid = remove_null_key(param_dict)
+                            #     {
+                            #     # 'batch_size': [4],
+                            #     # 'learning_rate': [0.001, 0.01],
+                            #     'batch_size': (4, 64),
+                            #     'learning_rate': (0.001, 0.5)
+                            #     # 'max_epochs': [5, 10]
+                            # }
+                            def optimize_function(batch_size,learning_rate):
+                                self.init(self.init_method, self.optimizer, learning_rate, self.momentum, self.weight_decay,
+                                          self.nesterov,
+                                          self.betas, self.eps, self.lr_decay, self.initial_accumulator_value,
+                                          self.rho, self.alpha,
+                                          self.lambd, self.t0,
+                                          self.max_iter, self.max_eval)
+                                save_path = "{}_batch_size_{}_lr_{}.pdf".format(self.save_path,int(batch_size),learning_rate)
+                                metrics = kfold_cross_validation(self.encode_method, self.concat_reverse, self.workers,
+                                                                 self.timer, k_fold, None, self.epochs, int(batch_size),
+                                                                 self.model, self.init_method, self.optim, train_dataset,
+                                                                 self.metrics,
+                                                                 save_path,
+                                                                 self.enhancer_len, self.promoter_len, self.num_heads,
+                                                                 self.num_layers, self.num_hiddens,
+                                                                 self.
+                                                                 ffn_num_hiddens,
+                                                                 self.device, self.verbose)
+                                return metrics
+                            print(param_grid)
+                            optimizer = BayesianOptimization(f=optimize_function,pbounds=param_grid,
+                                                 verbose=2,
+                                                 # verbose = 1 prints only when a maximum is observed, verbose = 0 is silent
+                                                 random_state=self.random_state)
+                            optimizer.maximize(
+                                init_points=self.init_points,  # 执行随机搜索的步数
+                                n_iter=self.n_iter,  # 执行贝叶斯优化的步数
+                            )
+                            print(optimizer.max)
+
+                    else:
+                        metrics = kfold_cross_validation(self.encode_method, self.concat_reverse, self.workers, self.timer,k_fold, log_writer, self.epochs, self.batch_size,
+                                                         self.model, self.init_method, self.optim, train_dataset, self.metrics,
+                                                         self.save_path,
+                                                         self.enhancer_len, self.promoter_len, self.num_heads,
+                                                         self.num_layers, self.num_hiddens,
+                                                         self.
+                                                         ffn_num_hiddens,
+                                                         self.device, self.verbose)
+
+            self.timer.final_stop()
+            fprint(msg="Total time: {}s".format(self.timer.final_elapsed_time()))
 
 
 
+
+def ddp_train(gpu_rank,world_size,gpus,nr,timer,epochs,log_writer,training_model,train_dataset,test_dataset,optim,
+            batch_size,workers,
+            save_param_dir,save_param_prefix,
+          verbose):
+    print(gpu_rank)
+    rank = nr * gpus + gpu_rank
+    dist.init_process_group(
+        backend='nccl',
+        init_method='env://',
+        world_size=world_size,
+        rank=rank
+    )
+    ## prepare the dataloader
+    train_sampler = torch.utils.data.distributed.DistributedSampler(
+        train_dataset,
+        num_replicas=world_size,
+        rank=rank
+    )
+    test_sampler = torch.utils.data.distributed.DistributedSampler(
+        test_dataset,
+        num_replicas=world_size,
+        rank=rank
+    )
+    ddp_train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=False,
+                                      pin_memory=True,
+                                      num_workers=workers, sampler=train_sampler)
+    ddp_test_dataloader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, pin_memory=True,
+                                     num_workers=workers, sampler=test_sampler)
+    ##
+    torch.cuda.set_device(gpu_rank)
+    training_model.cuda(gpu_rank)
+
+    training_model = nn.parallel.DistributedDataParallel(training_model,
+                                                device_ids=[gpu_rank])
+
+    for epoch in range(epochs):
+        timer.start()
+        train_each(epoch, log_writer, "Train", training_model, ddp_train_dataloader, ddp_test_dataloader, optim,
+                   None, verbose)
+        timer.stop()
+        fprint(msg="Cost: {:.3f}s/Epoch".format(timer.elapsed_time()))
+    fprint(msg="Saving parameters of current model...")
+    save_weights(training_model, save_param_dir, save_param_prefix)
+    fprint(msg="Saved done!")
