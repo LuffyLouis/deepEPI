@@ -205,8 +205,11 @@ train_module = subparsers.add_parser("Train",formatter_class=argparse.RawTextHel
 train_module.add_argument('--nodes', default=1,type=int, metavar='N')
 train_module.add_argument('--gpus', default=1,type=int,help='number of gpus per node')
 train_module.add_argument('--nr', default=0, type=int,help='ranking within the nodes')
+# train_module.add_argument('--local_rank', default=0, type=int,required=True,help='local_rank')
 train_module.add_argument('--master', default=None,help='the address of master node (IP:PORT)\n'
                                                                  'e.g. 192.168.10.1:8888')
+train_module.add_argument('--start_mode', default=None,help='start mode: mpspawn or launch\n'
+                                                            'Note: the --use_env must be specified for launch mode!!!')
 train_module.add_argument("-i","--input",help="input .h5 file for training")
 train_module.add_argument("--test_input",default=None,help="input .h5 file for test")
 
@@ -651,7 +654,9 @@ def main():
         nodes = arg.nodes
         gpus = arg.gpus
         nr = arg.nr
-        ddp_info = [nodes,gpus,nr,master]
+        start_mode = arg.start_mode
+        # local_rank = arg.local_rank
+        ddp_info = [nodes, gpus, nr, master, start_mode]
         # print(master.split(":")[0])
         if master:
             os.environ['MASTER_ADDR'] = master.split(":")[0]
