@@ -375,7 +375,7 @@ class TrainModel:
                  model, encode_method,concat_reverse,
                  enhancer_len,promoter_len,heads,num_layers,num_hiddens,ffn_num_hiddens,
                  is_param_optim, param_optim_strategy,params_config,random_size,
-                 init_points,n_iter,
+                 init_points, n_iter,
                  k_fold,metrics,save_path,
                  init_method, epochs, lr, optimizer, batch_size, momentum,
                  weight_decay, nesterov, betas, eps, lr_decay, initial_accumulator_value, rho, alpha,
@@ -390,10 +390,14 @@ class TrainModel:
         self.nodes = self.ddp_info[0]
         self.gpus = self.ddp_info[1]
         self.nr = self.ddp_info[2]
+        # self.local_rank = self.ddp_info[3]
         self.master = self.ddp_info[3]
+        self.start_mode = self.ddp_info[4]
         self.world_size = self.nodes * self.gpus
         if self.master:
             fprint(msg="Initializing the DDP mode...")
+            self.ddp_mode = True
+        if self.start_mode:
             self.ddp_mode = True
         ##
         self.n_iter = n_iter
@@ -546,11 +550,26 @@ class TrainModel:
                 #             self.batch_size,self.workers,
                 #             self.save_param_dir,self.save_param_prefix,self.verbose)
                 fprint("WARNING","The ddp mode does not support the tensorboard now!!!")
-                os.environ['NCCL_SOCKET_IFNAME'] = 'eth0'
-                mp.spawn(ddp_train, nprocs=self.gpus, args=(self.world_size,self.gpus,self.nr,self.timer,self.epochs,None,
-                          self.training_model,train_dataset,test_dataset,self.optim,
-                            self.batch_size,self.workers,
-                            self.save_param_dir,self.save_param_prefix,self.verbose,))
+
+                # os.environ['NCCL_SOCKET_IFNAME'] = 'eth0'
+                if self.start_mode.lower() == "mpspawn":
+                    mp.spawn(ddp_train, nprocs=self.gpus,
+                             args=(self.world_size, self.gpus, self.nr, self.timer, self.epochs, None,
+                                     self.training_model,train_dataset,test_dataset,self.optim,
+                                       self.batch_size,self.workers,
+                                       self.save_param_dir,self.save_param_prefix,self.verbose,),
+                                    daemon=True)
+                else:
+                    local_rank = int(os.environ["LOCAL_RANK"])
+                    ddp_train(local_rank,self.world_size,self.gpus,self.nr,self.timer,self.epochs,None,
+                              self.training_model,train_dataset,test_dataset,self.optim,
+                                self.batch_size,self.workers,
+                                self.save_param_dir,self.save_param_prefix,self.verbose)
+                # mp.spawn(ddp_train, nprocs=self.gpus, args=(self.world_size,self.gpus,self.nr,self.timer,self.epochs,None,
+                #           self.training_model,train_dataset,test_dataset,self.optim,
+                #             self.batch_size,self.workers,
+                #             self.save_param_dir,self.save_param_prefix,self.verbose,),
+                #          daemon=True)
             else:
                 train_dataset_file = self.train_dataset_file
                 train_dataset = EPIDatasets(cache_file_path=train_dataset_file)
@@ -558,7 +577,6 @@ class TrainModel:
                 test_dataset = EPIDatasets(cache_file_path=self.test_dataset_file)
                 test_dataloader = DataLoader(test_dataset, batch_size=self.batch_size, shuffle=False,num_workers=self.workers)
                 if self.k_fold is None:
-
                     for epoch in range(self.epochs):
                         self.timer.start()
                         train_each(epoch, log_writer, "Train", self.training_model, train_dataloader,test_dataloader, self.optim, self.device, self.verbose)
