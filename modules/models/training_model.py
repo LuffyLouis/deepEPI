@@ -570,7 +570,6 @@ class TrainModel:
                 #             self.save_param_dir,self.save_param_prefix,self.verbose,),
                 #          daemon=True)
             else:
-                print("Fuck!@!!")
                 train_dataset_file = self.train_dataset_file
                 train_dataset = EPIDatasets(cache_file_path=train_dataset_file)
                 train_dataloader = DataLoader(train_dataset, batch_size=self.batch_size, shuffle=False,num_workers=self.workers)
