@@ -546,6 +546,7 @@ class TrainModel:
                 #             self.batch_size,self.workers,
                 #             self.save_param_dir,self.save_param_prefix,self.verbose)
                 fprint("WARNING","The ddp mode does not support the tensorboard now!!!")
+                os.environ['NCCL_SOCKET_IFNAME'] = 'eth0'
                 mp.spawn(ddp_train, nprocs=self.gpus, args=(self.world_size,self.gpus,self.nr,self.timer,self.epochs,None,
                           self.training_model,train_dataset,test_dataset,self.optim,
                             self.batch_size,self.workers,
