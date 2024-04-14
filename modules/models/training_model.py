@@ -236,7 +236,8 @@ def kfold_cross_validation(encode_method, concat_reverse,workers,timer,
                 # print(model_evaluator.calculate_roc_curve())
                 # model_evaluator.plot_roc_curve(save_path="./ROC.pdf")
             timer.stop()
-            print(f"Epoch {epoch}: Val Loss: {val_loss:.4f}, Val Accuracy: {accuracy:.2f}%, Cost: {timer.elapsed_time():.3f}s/Epoch")
+            print(f"Epoch {epoch}: Val Loss: {val_loss:.4f}, Val Accuracy: {accuracy:.2f}%, Cost: {timer.elapsed_time():.3f}s/Epoch,"
+                  f" Avg Cost: {timer.final_elapsed_time()/(epoch+1):.3f}s/Epoch")
 
     model_evaluator = ModelEvaluator(y_true_list=y_true_list, y_pred_list=y_pred_list)
     # model_evaluator.calculate_roc_curve()
@@ -537,7 +538,8 @@ class TrainModel:
                     self.timer.start()
                     train_each(epoch, log_writer, "Train", self.training_model, train_dataloader,test_dataloader, self.optim, self.device, self.verbose)
                     self.timer.stop()
-                    fprint(msg="Cost: {:3f}s/Epoch".format(self.timer.elapsed_time()))
+                    self.timer.final_stop()
+                    fprint(msg="Cost: {:3f}s/Epoch, Avg cost: {:.3f}s/Epoch".format(self.timer.elapsed_time(),self.timer.final_elapsed_time()/(epoch+1)))
         else:
             if self.ddp_mode:
                 train_dataset = EPIDatasets(cache_file_path=self.train_dataset_file)
@@ -581,7 +583,8 @@ class TrainModel:
                         self.timer.start()
                         train_each(epoch, log_writer, "Train", self.training_model, train_dataloader,test_dataloader, self.optim, self.device, self.verbose)
                         self.timer.stop()
-                        fprint(msg="Cost: {:.3f}s/Epoch".format(self.timer.elapsed_time()))
+                        self.timer.final_stop()
+                        fprint(msg="Cost: {:.3f}s/Epoch, Avg cost: {:.3f}s/Epoch".format(self.timer.elapsed_time(),self.timer.final_elapsed_time()/(epoch+1)))
                     fprint(msg="Saving parameters of current model...")
                     save_weights(self.training_model, self.save_param_dir, self.save_param_prefix)
                     fprint(msg="Saved done!")
@@ -779,7 +782,8 @@ def ddp_train(gpu_rank,world_size,gpus,nr,timer,epochs,log_writer,training_model
         train_each(epoch, log_writer, "Train", training_model, ddp_train_dataloader, ddp_test_dataloader, optim,
                    None, verbose)
         timer.stop()
-        fprint(msg="Cost: {:.3f}s/Epoch".format(timer.elapsed_time()))
+        timer.final_stop()
+        fprint(msg="Cost: {:.3f}s/Epoch, Avg cost: {:.3f}s/Epoch".format(timer.elapsed_time(),timer.final_elapsed_time()/(epoch+1)))
     fprint(msg="Saving parameters of current model...")
     save_weights(training_model, save_param_dir, save_param_prefix)
     fprint(msg="Saved done!")
